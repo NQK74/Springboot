@@ -1,6 +1,10 @@
 package com.example.laptopshop.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -13,8 +17,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
+    @Min(value = 3, message = "Full name phải có ít nhất 3 ký tự")
     private String fullName;
+
+    @Email(message = "Email không hợp lệ", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+    @NotEmpty(message = "Email không được để trống")
     private String email;
+
+    @NotNull
+    @Min(value = 5, message = "Password phải có ít nhất 5 ký tự")
     private String password;
     private String address;
     private String phone;
@@ -22,13 +34,29 @@ public class User {
     private String avatar;
 
     // roleId
-    //User many -> to one Role
+    // User many -> to one Role
     @ManyToOne
     @JoinColumn(name = "role_id") // foreign key
     private Role role;
 
     @OneToMany(mappedBy = "user")
     private List<Order> order;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public List<Order> getOrder() {
+        return order;
+    }
+
+    public void setOrder(List<Order> order) {
+        this.order = order;
+    }
 
     public User() {
     }

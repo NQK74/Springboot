@@ -22,7 +22,8 @@ public class OrderDetail {
     @JoinColumn(name = "product_id") // foreign key
     private Product product;
 
-    public OrderDetail() {}
+    public OrderDetail() {
+    }
 
     public OrderDetail(long id, int quantity, double price) {
         this.id = id;
@@ -52,6 +53,22 @@ public class OrderDetail {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public String toString() {

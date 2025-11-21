@@ -12,6 +12,33 @@
     <title>Update User</title>
     <link href="/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            const avatarFile = $("#avatarFile");
+            const avatarPreview = $("#avatarPreview");
+            const currentAvatar = "${user.avatar}";
+            
+            // Hiển thị avatar hiện tại nếu có
+            if (currentAvatar) {
+                avatarPreview.attr("src", "/images/avatar/" + currentAvatar);
+                avatarPreview.show();
+            }
+            
+            avatarFile.change(function (e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    if (file.type.startsWith('image/')) {
+                        const imgURL = URL.createObjectURL(file);
+                        avatarPreview.attr("src", imgURL);
+                        avatarPreview.show();
+                    } else {
+                        alert("Vui lòng chọn file hình ảnh!");
+                    }
+                }
+            });
+        });
+    </script>
 </head>
 <body class="sb-nav-fixed">
     <jsp:include page="../layout/header.jsp" />
@@ -29,7 +56,7 @@
             <div class="row">
             <div class="col-md-6 col-12 mx-auto">
                 <h3>Update a User</h3> <hr/>
-                <form:form method="post" action="/admin/user/update/${user.id}" modelAttribute="user">
+                <form:form method="post" action="/admin/user/update/${user.id}" modelAttribute="user" enctype="multipart/form-data">
                     <div class="mb-3" style="display: none;">
                         <label class="form-label">Id</label>
                         <form:input type="text" class="form-control" path="id"/>
@@ -54,6 +81,30 @@
                         <label for="address" class="form-label">Address</label>
                         <form:input type="text" class="form-control" path="address"/>
                     </div>
+
+                    <div class="row">
+                    <div class="mb-3 col-12 col-md-6">
+                    <label for="role" class="form-label">Role</label>
+                        <form:select class="form-select" path="role.name" >
+                            <form:option value="ADMIN">ADMIN</form:option>
+                            <form:option value="USER">USER</form:option>
+                        </form:select>
+                    </div>
+
+                    <br>
+                    <div class="mb-3 col-12 col-md-6">
+                    <label for="avatarFile" class="form-label">Avatar</label>
+                    <input class="form-control" type="file" id="avatarFile" accept=" .png, .jpg, .jpeg, .webp" name = "khanhFile"/>
+                    </div>
+
+
+                    <div class="mb-3 col-12">
+                    <img id="avatarPreview" alt="avatarPreview" style="max-width: 250px; display: none;" />
+                    </div>
+                    </div>
+
+
+                    
                     <button type="submit" class="btn btn-warning">Update</button>
                 </form:form>
             </div>
