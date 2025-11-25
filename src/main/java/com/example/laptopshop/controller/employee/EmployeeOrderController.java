@@ -1,4 +1,4 @@
-package com.example.laptopshop.controller.admin;
+package com.example.laptopshop.controller.employee;
 
 import com.example.laptopshop.domain.Order;
 import com.example.laptopshop.service.OrderService;
@@ -14,65 +14,48 @@ import java.util.Arrays;
 import java.util.List;
 
 @Controller
-public class OrderController {
+public class EmployeeOrderController {
 
     private final OrderService orderService;
     private static final List<String> VALID_STATUSES = Arrays.asList("PENDING", "SHIPPING", "COMPLETE", "CANCEL");
 
-    public OrderController(OrderService orderService) {
+    public EmployeeOrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    @GetMapping("/admin/order")
+    @GetMapping("/employee/order")
     public String getOrderPage(Model model) {
         List<Order> orders = this.orderService.getAllOrders();
         model.addAttribute("orders", orders);
-        return "admin/order/show";
+        return "employee/order/show";
     }
 
-    @GetMapping("/admin/order/{id}")
+    @GetMapping("/employee/order/{id}")
     public String getOrderDetailPage(Model model, @PathVariable Long id) {
         Order order = this.orderService.getOrderById(id);
         if (order == null) {
-            return "redirect:/admin/order";
+            return "redirect:/employee/order";
         }
         model.addAttribute("order", order);
         model.addAttribute("id", id);
-        return "admin/order/detail";
+        return "employee/order/detail";
     }
 
-    @GetMapping("/admin/order/update/{id}")
+    @GetMapping("/employee/order/update/{id}")
     public String getUpdateOrderPage(Model model, @PathVariable Long id) {
         Order order = this.orderService.getOrderById(id);
         if (order == null) {
-            return "redirect:/admin/order";
+            return "redirect:/employee/order";
         }
         model.addAttribute("order", order);
-        return "admin/order/update";
+        return "employee/order/update";
     }
 
-    @PostMapping("/admin/order/update/{id}")
+    @PostMapping("/employee/order/update/{id}")
     public String postUpdateOrder(@PathVariable Long id, @RequestParam("status") String status) {
         if (VALID_STATUSES.contains(status)) {
             this.orderService.updateOrderStatus(id, status);
         }
-        return "redirect:/admin/order";
-    }
-
-    @GetMapping("/admin/order/delete/{id}")
-    public String getDeleteOrderPage(Model model, @PathVariable Long id) {
-        Order order = this.orderService.getOrderById(id);
-        if (order == null) {
-            return "redirect:/admin/order";
-        }
-        model.addAttribute("order", order);
-        model.addAttribute("id", id);
-        return "admin/order/delete";
-    }
-
-    @PostMapping("/admin/order/delete/{id}")
-    public String postDeleteOrder(@PathVariable Long id) {
-        this.orderService.deleteOrderById(id);
-        return "redirect:/admin/order";
+        return "redirect:/employee/order";
     }
 }
