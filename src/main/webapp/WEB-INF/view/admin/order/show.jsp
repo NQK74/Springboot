@@ -53,7 +53,7 @@
                                         <td>${order.receiverName}</td>
                                         <td>${order.receiverPhone}</td>
                                         <td>
-                                            <fmt:formatNumber type="number" value="${order.totalPrice}" /> đ
+                                            <fmt:formatNumber type="number" value="${order.totalPrice}" /> VND
                                         </td>
                                         <td>
                                             <c:choose>

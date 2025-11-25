@@ -85,8 +85,8 @@
                                             <tr>
                                                 <td>${orderDetail.product.name}</td>
                                                 <td>${orderDetail.quantity}</td>
-                                                <td><fmt:formatNumber type="number" value="${orderDetail.price}" /> đ</td>
-                                                <td><fmt:formatNumber type="number" value="${orderDetail.price * orderDetail.quantity}" /> đ</td>
+                                                <td><fmt:formatNumber type="number" value="${orderDetail.price}" /> VND</td>
+                                                <td><fmt:formatNumber type="number" value="${orderDetail.price * orderDetail.quantity}" /> VND</td>
                                             </tr>
                                         </c:forEach>
                                     </tbody>
