@@ -17,6 +17,10 @@
     scroll-behavior: smooth;
 }
 
+a {
+    text-decoration: none !important;
+}
+
 /* ========== NAVBAR PREMIUM ========== */
 .navbar-enhanced {
     background: linear-gradient(135deg, rgba(15, 26, 61, 0.98) 0%, rgba(23, 37, 84, 0.95) 100%);
@@ -1383,7 +1387,7 @@
 }
 
 /* ========== REVIEW FORM PREMIUM ========== */
-form {
+review-form {
     background: linear-gradient(135deg, rgba(23, 37, 84, 0.03) 0%, rgba(0, 212, 255, 0.02) 100%);
     padding: 50px;
     border-radius: 20px;

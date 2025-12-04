@@ -1,10 +1,7 @@
 package com.example.laptopshop.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+
 
 import java.util.List;
 
@@ -17,16 +14,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull
-    @Min(value = 3, message = "Full name phải có ít nhất 3 ký tự")
+   
     private String fullName;
 
-    @Email(message = "Email không hợp lệ", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
-    @NotEmpty(message = "Email không được để trống")
     private String email;
 
-    @NotNull
-    @Min(value = 5, message = "Password phải có ít nhất 5 ký tự")
+
     private String password;
     private String address;
     private String phone;
@@ -42,6 +35,10 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Order> order;
 
+    // User has one Cart
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
+
     public Role getRole() {
         return role;
     }
@@ -56,6 +53,14 @@ public class User {
 
     public void setOrder(List<Order> order) {
         this.order = order;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public User() {

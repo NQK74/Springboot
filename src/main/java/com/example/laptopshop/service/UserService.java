@@ -3,7 +3,9 @@ package com.example.laptopshop.service;
 import java.util.List;
 
 import com.example.laptopshop.domain.Role;
+import com.example.laptopshop.domain.dto.RegisterDTO;
 import com.example.laptopshop.repository.RoleRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.laptopshop.domain.User;
@@ -14,10 +16,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String handleHello() {
@@ -30,6 +34,10 @@ public class UserService {
 
     public List<User> getAllUsersByEmail(String email) {
         return this.userRepository.findByEmail(email);
+    }
+
+    public User getUserByEmail(String email) {
+        return this.userRepository.findFirstByEmail(email);
     }
 
     public User handleSaveUser(User user) {
@@ -48,5 +56,18 @@ public class UserService {
 
     public Role getRoleByName(String name) {
         return this.roleRepository.findByName(name);
+    }
+
+    public boolean checkEmailExist(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
+    public User registerDTOtoUser(RegisterDTO registerDTO) {
+        User user = new User();
+        user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());
+        user.setEmail(registerDTO.getEmail());
+        user.setPassword(this.passwordEncoder.encode(registerDTO.getPassword()));
+        user.setRole(this.roleRepository.findByName("USER"));
+        return user;
     }
 }
