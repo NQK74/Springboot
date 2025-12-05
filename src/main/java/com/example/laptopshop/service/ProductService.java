@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.laptopshop.domain.Cart;
 import com.example.laptopshop.domain.CartDetail;
@@ -31,9 +32,8 @@ public class ProductService {
     }
 
     public Product getProductById(long id) {
-        // SỬA LẠI METHOD NÀY
         Optional<Product> optionalProduct = this.productRepository.findById(id);
-        return optionalProduct.orElse(null); // Trả về null nếu không tìm thấy
+        return optionalProduct.orElse(null);
     }
 
     public Product createProduct(Product product) {
@@ -56,56 +56,79 @@ public class ProductService {
         return this.cartRepository.findByUser(user);
     }
 
+    @Transactional
     public void handleAddProductToCart(String email, long productId, HttpSession session) {
-        // Logic to add product to cart
         User user = this.userService.getUserByEmail(email);
         
         if (user != null) {
-            Cart  cart = this.cartRepository.findByUser(user);
+            Cart cart = this.cartRepository.findByUser(user);
 
             if (cart == null) {
-            //tao moi cart
-                Cart otherCart = new Cart();
-                otherCart.setUser(user);
-                otherCart.setSum(0);
-                cart = this.cartRepository.save(otherCart);
+                Cart newCart = new Cart();
+                newCart.setUser(user);
+                newCart.setSum(0);
+                cart = this.cartRepository.save(newCart);
             }
         
-        // save cart detail
-        //tim cart product by id
-        Optional<Product> productOptional = this.productRepository.findById(productId);
-        
-        if (productOptional.isPresent()) {
-            Product realProduct = productOptional.get();
-
-            // check san pham da co trong cart chua
-            CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(cart, realProduct);
+            Optional<Product> productOptional = this.productRepository.findById(productId);
             
-            if (oldDetail == null) {
-                // chua co san pham trong cart -> tao moi
-                CartDetail cartDetail = new CartDetail();
-                cartDetail.setCart(cart);
-                cartDetail.setProduct(realProduct);
-                cartDetail.setQuantity(1);
-                cartDetail.setPrice(realProduct.getPrice());
+            if (productOptional.isPresent()) {
+                Product realProduct = productOptional.get();
 
-                this.cartDetailRepository.save(cartDetail);
+                CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(cart, realProduct);
                 
-                // cap nhat sum trong cart
-                int sum = cart.getSum() + 1;
-                cart.setSum(sum);
-                this.cartRepository.save(cart);
-                session.setAttribute("sum", sum);
-            } else {
-                // da co san pham trong cart -> tang quantity
-                oldDetail.setQuantity(oldDetail.getQuantity() + 1);
-                this.cartDetailRepository.save(oldDetail);
-            }
-            
-        }
+                if (oldDetail == null) {
+                    CartDetail cartDetail = new CartDetail();
+                    cartDetail.setCart(cart);
+                    cartDetail.setProduct(realProduct);
+                    cartDetail.setQuantity(1);
+                    cartDetail.setPrice(realProduct.getPrice());
 
+                    this.cartDetailRepository.save(cartDetail);
+                    
+                    int sum = cart.getSum() + 1;
+                    cart.setSum(sum);
+                    this.cartRepository.save(cart);
+                    session.setAttribute("sum", sum);
+                } else {
+                    oldDetail.setQuantity(oldDetail.getQuantity() + 1);
+                    this.cartDetailRepository.save(oldDetail);
+                }
+            }
         }
-        
     }
 
+    @Transactional
+    public void handleRemoveCartDetail(long cartDetailId, HttpSession session) {
+        Optional<CartDetail> cartDetailOptional = this.cartDetailRepository.findById(cartDetailId);
+        
+        if (cartDetailOptional.isPresent()) {
+            CartDetail cartDetail = cartDetailOptional.get();
+            
+            // ✅ LẤY cartId TRƯỚC KHI XÓA
+            long cartId = cartDetail.getCart().getId();
+            
+            // ✅ XÓA CartDetail trước
+            this.cartDetailRepository.deleteById(cartDetailId);
+            
+            // ✅ SAU ĐÓ LẤY LẠI Cart từ database (để có managed entity)
+            Optional<Cart> cartOptional = this.cartRepository.findById(cartId);
+            
+            if (cartOptional.isPresent()) {
+                Cart currentCart = cartOptional.get();
+                int currentSum = currentCart.getSum();
+                
+                if (currentSum > 1) {
+                    // Còn sản phẩm -> giảm sum
+                    currentCart.setSum(currentSum - 1);
+                    this.cartRepository.save(currentCart);
+                    session.setAttribute("sum", currentSum - 1);
+                } else {
+                    // Không còn sản phẩm -> xóa cart
+                    this.cartRepository.deleteById(cartId);
+                    session.setAttribute("sum", 0);
+                }
+            }
+        }
+    }
 }
