@@ -1,7 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,283 +20,8 @@
     
     <!-- Template Stylesheet -->
     <link rel="stylesheet" href="/client/css/style.css">
-    
-    <style>
-        .checkout-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            min-height: 100vh;
-        }
-        
-        .checkout-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-        
-        .checkout-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px 30px;
-        }
-        
-        .checkout-header h4 {
-            margin: 0;
-            font-weight: 700;
-        }
-        
-        .checkout-header p {
-            margin: 5px 0 0;
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
-        
-        .checkout-body {
-            padding: 30px;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 8px;
-        }
-        
-        .form-control {
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-        }
-        
-        .form-select {
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-        }
-        
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            color: #667eea;
-        }
-        
-        /* Order Summary */
-        .order-summary {
-            background: #f8f9fa;
-            border-radius: 16px;
-            padding: 25px;
-        }
-        
-        .order-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .order-item:last-child {
-            border-bottom: none;
-        }
-        
-        .order-item-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 10px;
-            object-fit: cover;
-            margin-right: 15px;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .order-item-info {
-            flex: 1;
-        }
-        
-        .order-item-name {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-        }
-        
-        .order-item-quantity {
-            color: #718096;
-            font-size: 0.85rem;
-        }
-        
-        .order-item-price {
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        .order-total-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-        
-        .order-total-row:last-child {
-            border-bottom: none;
-            padding-top: 15px;
-            margin-top: 5px;
-            border-top: 2px solid #667eea;
-        }
-        
-        .order-total-row.final {
-            font-size: 1.2rem;
-        }
-        
-        .order-total-row.final .order-total-value {
-            color: #667eea;
-        }
-        
-        .order-total-label {
-            color: #718096;
-        }
-        
-        .order-total-value {
-            font-weight: 600;
-            color: #2d3748;
-        }
-        
-        /* Payment Methods */
-        .payment-method {
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 15px;
-        }
-        
-        .payment-method:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-        
-        .payment-method.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        }
-        
-        .payment-method .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
-        }
-        
-        .payment-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.3rem;
-            margin-right: 15px;
-        }
-        
-        .payment-info h6 {
-            margin: 0;
-            font-weight: 600;
-            color: #2d3748;
-        }
-        
-        .payment-info p {
-            margin: 5px 0 0;
-            font-size: 0.85rem;
-            color: #718096;
-        }
-        
-        /* Submit Button */
-        .btn-checkout {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 16px 40px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-checkout:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-        
-        .btn-checkout:active {
-            transform: translateY(-1px);
-        }
-        
-        .btn-back {
-            background: transparent;
-            border: 2px solid #e2e8f0;
-            color: #718096;
-            padding: 14px 30px;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-back:hover {
-            border-color: #667eea;
-            color: #667eea;
-            background: #f8f9ff;
-        }
-        
-        /* Security Badge */
-        .security-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
-            padding: 15px;
-            background: #f0fff4;
-            border-radius: 10px;
-            color: #38a169;
-            font-size: 0.9rem;
-        }
-        
-        .security-badge i {
-            font-size: 1.2rem;
-        }
-        
-        /* Responsive */
-        @media (max-width: 991px) {
-            .order-summary {
-                margin-top: 30px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/client/css/cart/checkout.css">
+
 </head>
 <body>
     <!-- Header -->
@@ -319,7 +43,7 @@
                 </div>
             </div>
             
-            <form:form action="/place-order" method="post" modelAttribute="cart">
+            <form action="/place-order" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 
                 <div class="row">
@@ -363,34 +87,6 @@
                                     </label>
                                     <input type="text" class="form-control" name="receiverAddress" 
                                            placeholder="Số nhà, tên đường, phường/xã" required>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Tỉnh/Thành Phố</label>
-                                        <select class="form-select" name="city" required>
-                                            <option value="">-- Chọn Tỉnh/Thành --</option>
-                                            <option value="Hà Nội">Hà Nội</option>
-                                            <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
-                                            <option value="Đà Nẵng">Đà Nẵng</option>
-                                            <option value="Cần Thơ">Cần Thơ</option>
-                                            <option value="Hải Phòng">Hải Phòng</option>
-                                            <option value="Bình Dương">Bình Dương</option>
-                                            <option value="Đồng Nai">Đồng Nai</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Quận/Huyện</label>
-                                        <select class="form-select" name="district" required>
-                                            <option value="">-- Chọn Quận/Huyện --</option>
-                                            <option value="Quận 1">Quận 1</option>
-                                            <option value="Quận 2">Quận 2</option>
-                                            <option value="Quận 3">Quận 3</option>
-                                            <option value="Quận 7">Quận 7</option>
-                                            <option value="Quận Bình Thạnh">Quận Bình Thạnh</option>
-                                            <option value="Quận Tân Bình">Quận Tân Bình</option>
-                                        </select>
-                                    </div>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -529,7 +225,7 @@
                         </div>
                     </div>
                 </div>
-            </form:form>
+            </form>
         </div>
     </div>
 

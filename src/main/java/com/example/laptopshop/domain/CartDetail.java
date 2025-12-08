@@ -17,15 +17,15 @@ public class CartDetail {
     private long id;
 
     private long quantity;
-
     private double price;
+    
+    // Thêm field để đánh dấu sản phẩm được chọn
+    private boolean selected = true; // Mặc định chọn tất cả
 
-    // CartDetail belongs to one Cart
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    // CartDetail belongs to one Product
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
@@ -68,5 +68,13 @@ public class CartDetail {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

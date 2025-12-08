@@ -1,7 +1,7 @@
 package com.example.laptopshop.controller.admin;
 
-import com.example.laptopshop.service.ProductService;
-import com.example.laptopshop.service.UploadService;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,16 +9,15 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import com.example.laptopshop.domain.Product;
-
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.example.laptopshop.domain.Product;
+import com.example.laptopshop.service.ProductService;
+import com.example.laptopshop.service.UploadService;
+
+import jakarta.validation.Valid;
 
 @Controller
 public class ProductController {
@@ -123,8 +122,16 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product/delete/{id}")
-    public String postDeleteProduct(@PathVariable Long id) {
-        this.productService.deleteAProduct(id);
-        return "redirect:/admin/product";
+    public String postDeleteProduct(@PathVariable Long id, Model model) {
+        try {
+            this.productService.deleteAProduct(id);
+            return "redirect:/admin/product";
+        } catch (Exception e) {
+            Product product = this.productService.getProductById(id);
+            model.addAttribute("id", id);
+            model.addAttribute("product", product);
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/product/delete";
+        }
     }
 }

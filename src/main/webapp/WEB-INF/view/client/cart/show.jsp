@@ -6,172 +6,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <title>Giỏ Hàng - LaptopShop</title>
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
-
-    <!-- Icon Font Stylesheet -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Template Stylesheet -->
     <link rel="stylesheet" href="/client/css/style.css">
-    
-    <style>
-        .empty-cart-container {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 20px;
-            padding: 60px 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            margin: 40px auto;
-            max-width: 600px;
-        }
+    <link rel="stylesheet" href="/client/css/cart/show.css">
         
-        .cart-icon-wrapper {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
-            }
-        }
-        
-        .cart-icon-wrapper i {
-            color: white;
-            font-size: 3.5rem;
-        }
-        
-        .empty-cart-title {
-            color: #2d3748;
-            font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-        
-        .empty-cart-subtitle {
-            color: #718096;
-            font-size: 1.1rem;
-            margin-bottom: 35px;
-            line-height: 1.6;
-        }
-        
-        .shop-now-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 15px 45px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        .shop-now-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-        
-        .feature-list {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #4a5568;
-            font-size: 0.95rem;
-        }
-        
-        .feature-item i {
-            color: #667eea;
-            font-size: 1.2rem;
-        }
-
-        .quantity-controls {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 1rem;
-    }
-    
-    .quantity-btn {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        border: 2px solid #e5e7eb;
-        background: white;
-        color: #374151;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 0;
-    }
-    
-    .quantity-btn:hover {
-        background: #81c408;
-        border-color: #81c408;
-        color: white;
-        transform: scale(1.1);
-    }
-    
-    .quantity-btn:active {
-        transform: scale(0.95);
-    }
-    
-    .quantity-display {
-        min-width: 50px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #1f2937;
-        background: #f9fafb;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 0 12px;
-    }
-    </style>
 </head>
 <body>
-    <!-- Header -->
     <jsp:include page="../layout/header.jsp" />
 
-    <!-- Cart Section -->
     <div class="container-fluid py-5 mt-5">
         <div class="container py-5">
-            <!-- Breadcrumb -->
             <div class="row g-4 mb-4">
                 <div>
                     <nav aria-label="breadcrumb">
@@ -185,7 +36,6 @@
             
             <c:choose>
                 <c:when test="${empty cartDetails}">
-                    <!-- Empty Cart - Redesigned -->
                     <div class="empty-cart-container">
                         <div class="cart-icon-wrapper">
                             <i class="fas fa-shopping-cart"></i>
@@ -217,11 +67,21 @@
                     </div>
                 </c:when>
                 <c:otherwise>
+                    <!-- Select All Checkbox -->
+                    <div class="select-all-container">
+                        <input type="checkbox" class="select-all-checkbox" id="selectAll" checked>
+                        <label class="select-all-label" for="selectAll">
+                            <i class="fas fa-check-square me-2"></i>Chọn tất cả sản phẩm
+                        </label>
+                        <span class="ms-auto text-muted" id="selectedCount">(${cartDetails.size()} sản phẩm)</span>
+                    </div>
+
                     <!-- Cart Table -->
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th scope="col" style="width: 50px;">Chọn</th>
                                     <th scope="col">Sản phẩm</th>
                                     <th scope="col">Tên</th>
                                     <th scope="col">Giá</th>
@@ -231,8 +91,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="cartDetail" items="${cartDetails}">
-                                    <tr>
+                                <c:forEach var="cartDetail" items="${cartDetails}" varStatus="status">
+                                    <tr class="cart-item" data-cart-detail-id="${cartDetail.id}">
+                                        <td class="align-middle">
+                                            <input type="checkbox" 
+                                                   class="product-checkbox" 
+                                                   data-cart-detail-id="${cartDetail.id}"
+                                                   data-price="${cartDetail.price * cartDetail.quantity}"
+                                                   data-unit-price="${cartDetail.price}"
+                                                   ${cartDetail.selected ? 'checked' : ''}>
+                                        </td>
                                         <th scope="row">
                                             <div class="d-flex align-items-center">
                                                 <img src="/images/product/${cartDetail.product.image}" 
@@ -243,7 +111,7 @@
                                         </th>
                                         <td>
                                             <p class="mb-0 mt-4">
-                                                <a href="/product/${cartDetail.product.id}" target="_blank" style = "color: #00d4ff;">
+                                                <a href="/product/${cartDetail.product.id}" target="_blank" style="color: #00d4ff;">
                                                     ${cartDetail.product.name}
                                                 </a>
                                             </p>
@@ -258,7 +126,8 @@
                                                 <button class="quantity-btn btn-minus" 
                                                         data-cart-detail-id="${cartDetail.id}"
                                                         data-cart-detail-quantity="${cartDetail.quantity}"
-                                                        data-cart-detail-price="${cartDetail.price}">
+                                                        data-cart-detail-price="${cartDetail.price}"
+                                                        type="button">
                                                     <i class="fa fa-minus"></i>
                                                 </button>
                                                 
@@ -269,13 +138,16 @@
                                                 <button class="quantity-btn btn-plus"
                                                         data-cart-detail-id="${cartDetail.id}"
                                                         data-cart-detail-quantity="${cartDetail.quantity}"
-                                                        data-cart-detail-price="${cartDetail.price}">
+                                                        data-cart-detail-price="${cartDetail.price}"
+                                                        type="button">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
                                             </div>
                                         </td>
                                         <td>
-                                            <p class="mb-0 mt-4" data-cart-detail-id="${cartDetail.id}">
+                                            <p class="mb-0 mt-4 item-total" 
+                                               data-cart-detail-id="${cartDetail.id}"
+                                               data-price="${cartDetail.price * cartDetail.quantity}">
                                                 <fmt:formatNumber value="${cartDetail.price * cartDetail.quantity}" type="number"/> đ
                                             </p>
                                         </td>
@@ -302,9 +174,13 @@
                                         Thông Tin <span class="fw-normal" style="color: #00d4ff;">Đơn Hàng</span>
                                     </h4>
                                     <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                        <span class="text-muted">Sản phẩm đã chọn:</span>
+                                        <span class="fw-bold" id="selectedItemsCount">0</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                                         <span class="text-muted">Tạm tính:</span>
-                                        <span class="fw-bold total-price" style="color: #00d4ff;" data-cart-detail-id="${totalPrice}" data-cart-total="${totalPrice}">
-                                            <fmt:formatNumber value="${totalPrice}" type="number"/> đ
+                                        <span class="fw-bold total-price" style="color: #00d4ff;" id="subtotal">
+                                            0 đ
                                         </span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
@@ -313,14 +189,19 @@
                                     </div>
                                     <div class="d-flex justify-content-between mb-4">
                                         <span class="fw-bold">Tổng số tiền:</span>
-                                        <span class="fw-bold total-price" data-cart-detail-id="${totalPrice}" data-cart-total="${totalPrice}">
-                                            <fmt:formatNumber value="${totalPrice}" type="number"/> đ
+                                        <span class="fw-bold total-price" id="totalPrice">
+                                            0 đ
                                         </span>
                                     </div>
-                                    <a href="/checkout" class="btn w-100 py-3 text-white text-uppercase fw-bold" 
-                                       style="background: linear-gradient(#00d4ff); border-radius: 8px;">
-                                        <i class="fas fa-check me-2"></i>Xác Nhận Đặt Hàng
-                                    </a>
+                                    <form method="post" action="/confirm-checkout" id="checkoutForm">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                        <input type="hidden" name="selectedItems" id="selectedItemsInput">
+                                        <button type="submit" class="btn w-100 py-3 text-white text-uppercase fw-bold" 
+                                           style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; border: none;"
+                                           id="checkoutBtn">
+                                            <i class="fas fa-check me-2"></i>Xác Nhận Đặt Hàng
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -330,14 +211,10 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <jsp:include page="../layout/footer.jsp" />
 
-    <!-- jQuery (cần load trước) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Cart JS -->
     <script src="/client/js/cart.js"></script>
 </body>
 </html>
