@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <link rel="stylesheet" href="/css/layout/sidebar.css">
 
 <div id="layoutSidenav_nav">
@@ -15,12 +16,17 @@
                 </a>
                 
                 <div class="sb-sidenav-menu-heading">Quản Lý</div>
-                <a class="nav-link" href="/admin/user" data-page="user">
-                    <div class="sb-nav-link-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    Người Dùng
-                </a>
+                
+                <!-- User Management - Only visible to ADMIN and SUPER_ADMIN -->
+                <sec:authorize access="hasAnyRole('ADMIN', 'SUPER_ADMIN')">
+                    <a class="nav-link" href="/admin/user" data-page="user">
+                        <div class="sb-nav-link-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        Người Dùng
+                    </a>
+                </sec:authorize>
+                
                 <a class="nav-link" href="/admin/product" data-page="product">
                     <div class="sb-nav-link-icon">
                         <i class="fas fa-box"></i>
@@ -35,12 +41,14 @@
                 </a>
                 
                 <div class="sb-sidenav-menu-heading">Hệ Thống</div>
-                <a class="nav-link" href="/admin/settings" data-page="settings">
-                    <div class="sb-nav-link-icon">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    Cài Đặt
-                </a>
+                <sec:authorize access="hasAnyRole('ADMIN', 'SUPER_ADMIN')">
+                    <a class="nav-link" href="/admin/settings" data-page="settings">
+                        <div class="sb-nav-link-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        Cài Đặt
+                    </a>
+                </sec:authorize>
                 <a class="nav-link" href="/admin/reports" data-page="reports">
                     <div class="sb-nav-link-icon">
                         <i class="fas fa-chart-bar"></i>
@@ -52,11 +60,15 @@
         <div class="sb-sidenav-footer">
             <div class="sidebar-user-info">
                 <div class="sidebar-user-avatar">
-                    NQ
+                    ${sessionScope.fullName != null ? sessionScope.fullName.substring(0, 2).toUpperCase() : 'AD'}
                 </div>
                 <div class="sidebar-user-details">
-                    <div class="sidebar-user-name">NQK74</div>
-                    <div class="sidebar-user-role">Administrator</div>
+                    <div class="sidebar-user-name">${sessionScope.fullName != null ? sessionScope.fullName : 'Admin'}</div>
+                    <div class="sidebar-user-role">
+                        <sec:authorize access="hasRole('SUPER_ADMIN')">Super Administrator</sec:authorize>
+                        <sec:authorize access="hasRole('ADMIN')">Administrator</sec:authorize>
+                        <sec:authorize access="hasRole('STAFF')">Nhân viên</sec:authorize>
+                    </div>
                 </div>
             </div>
         </div>

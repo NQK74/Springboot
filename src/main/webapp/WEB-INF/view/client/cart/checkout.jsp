@@ -237,17 +237,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
-        function selectPayment(element, method) {
-            // Remove selected class from all
-            document.querySelectorAll('.payment-method').forEach(el => {
-                el.classList.remove('selected');
-            });
-            // Add selected class to clicked element
-            element.classList.add('selected');
-            // Check the radio button
-            element.querySelector('input[type="radio"]').checked = true;
-        }
-    </script>
+    <script src="/client/js/cart/checkout.js"></script>
 </body>
 </html>

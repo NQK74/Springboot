@@ -1,9 +1,15 @@
 package com.example.laptopshop.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +24,7 @@ import com.example.laptopshop.repository.CartRepository;
 import com.example.laptopshop.repository.OrderDetailRepository;
 import com.example.laptopshop.repository.OrderRepository;
 import com.example.laptopshop.repository.ProductRepository;
+import com.example.laptopshop.service.specification.ProductSpecification;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -69,6 +76,61 @@ public class ProductService {
         return this.productRepository.findAll();
     }
 
+    public Page<Product> fetchProductsWithPagination(int pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 6);
+        return this.productRepository.findAll(pageable);
+    }
+
+    public Page<Product> searchProductsWithPagination(String keyword, int pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 6);
+        return this.productRepository.searchProducts(keyword, pageable);
+    }
+
+    public Page<Product> fetchProductsWithFilters(int pageNo, List<String> factories, List<String> targets, 
+                                                   Double minPrice, Double maxPrice, String sort, String keyword) {
+        Specification<Product> spec = Specification.allOf();
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            spec = spec.and(ProductSpecification.hasNameContaining(keyword));
+        }
+        
+        if (factories != null && !factories.isEmpty()) {
+            spec = spec.and(ProductSpecification.hasFactory(factories));
+        }
+        
+        if (targets != null && !targets.isEmpty()) {
+            spec = spec.and(ProductSpecification.hasTarget(targets));
+        }
+        
+        if (minPrice != null || maxPrice != null) {
+            spec = spec.and(ProductSpecification.hasPriceBetween(minPrice, maxPrice));
+        }
+        
+        Sort sorting = Sort.by("id").descending();
+        if (sort != null) {
+            if ("price-asc".equals(sort)) {
+                sorting = Sort.by("price").ascending();
+            } else if ("price-desc".equals(sort)) {
+                sorting = Sort.by("price").descending();
+            } else if ("name-asc".equals(sort)) {
+                sorting = Sort.by("name").ascending();
+            } else if ("name-desc".equals(sort)) {
+                sorting = Sort.by("name").descending();
+            }
+        }
+        
+        Pageable pageable = PageRequest.of(pageNo - 1, 6, sorting);
+        return this.productRepository.findAll(spec, pageable);
+    }
+
+    public List<String> getAllFactories() {
+        return this.productRepository.findAllFactories();
+    }
+
+    public List<String> getAllTargets() {
+        return this.productRepository.findAllTargets();
+    }
+
     public Product updateProduct(Product product) {
         return this.productRepository.save(product);
     }
@@ -78,7 +140,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void handleAddProductToCart(String email, long productId, HttpSession session) {
+    public void handleAddProductToCart(String email, long productId, long quantity, HttpSession session) {
         User user = this.userService.getUserByEmail(email);
         
         if (user != null) {
@@ -102,7 +164,7 @@ public class ProductService {
                     CartDetail cartDetail = new CartDetail();
                     cartDetail.setCart(cart);
                     cartDetail.setProduct(realProduct);
-                    cartDetail.setQuantity(1);
+                    cartDetail.setQuantity(quantity);
                     cartDetail.setPrice(realProduct.getPrice());
                     cartDetail.setSelected(true); // Mặc định chọn sản phẩm mới
 
@@ -113,7 +175,7 @@ public class ProductService {
                     this.cartRepository.save(cart);
                     session.setAttribute("sum", sum);
                 } else {
-                    oldDetail.setQuantity(oldDetail.getQuantity() + 1);
+                    oldDetail.setQuantity(oldDetail.getQuantity() + quantity);
                     this.cartDetailRepository.save(oldDetail);
                 }
             }
@@ -204,6 +266,7 @@ public class ProductService {
         order.setNote(note);
         order.setPaymentMethod(paymentMethod);
         order.setStatus("PENDING");
+        order.setOrderDate(LocalDateTime.now());
 
         double totalPrice = 0;
         for (CartDetail cd : cartDetails) {
@@ -221,6 +284,15 @@ public class ProductService {
             orderDetail.setPrice(cd.getPrice());
             
             this.orderDetailRepository.save(orderDetail);
+            
+            // Giảm số lượng sản phẩm trong kho
+            Product product = cd.getProduct();
+            long newQuantity = product.getQuantity() - cd.getQuantity();
+            if (newQuantity < 0) {
+                newQuantity = 0;
+            }
+            product.setQuantity(newQuantity);
+            this.productRepository.save(product);
         }
 
         List<Long> cartDetailIds = new ArrayList<>();
@@ -273,6 +345,7 @@ public class ProductService {
         order.setNote(note);
         order.setPaymentMethod(paymentMethod);
         order.setStatus("PENDING");
+        order.setOrderDate(LocalDateTime.now());
 
         // Tính tổng giá chỉ cho các sản phẩm đã chọn
         double totalPrice = 0;
@@ -283,7 +356,7 @@ public class ProductService {
 
         order = this.orderRepository.save(order);
 
-        // Tạo OrderDetail cho các sản phẩm đã chọn
+        // Tạo OrderDetail cho các sản phẩm đã chọn và giảm số lượng tồn kho
         for (CartDetail cd : selectedCartDetails) {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(order);
@@ -292,6 +365,15 @@ public class ProductService {
             orderDetail.setPrice(cd.getPrice());
             
             this.orderDetailRepository.save(orderDetail);
+            
+            // Giảm số lượng sản phẩm trong kho
+            Product product = cd.getProduct();
+            long newQuantity = product.getQuantity() - cd.getQuantity();
+            if (newQuantity < 0) {
+                newQuantity = 0;
+            }
+            product.setQuantity(newQuantity);
+            this.productRepository.save(product);
         }
 
         // Xóa chỉ các CartDetail đã chọn

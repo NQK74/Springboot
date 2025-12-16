@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +31,41 @@
                     </div>
 
                     <div class="modern-card">
+                        <!-- Error/Success Messages -->
+                        <c:if test="${not empty error}">
+                            <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>${error}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </c:if>
+                        
                         <div class="card-header">
                             <h5><i class="fas fa-list me-2"></i>Danh Sách Người Dùng</h5>
-                            <a href="/admin/user/create" class="btn-create">
-                                <i class="fas fa-user-plus me-2"></i>Thêm Người Dùng
-                            </a>
+                            <div class="d-flex gap-3 align-items-center">
+                                <!-- Search Form -->
+                                <form action="/admin/user" method="get" class="admin-search-form">
+                                    <div class="admin-search-box">
+                                        <input type="text" name="keyword" class="admin-search-input" 
+                                               placeholder="Tìm email, họ tên..." value="${keyword}">
+                                        <button type="submit" class="admin-search-btn">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                <a href="/admin/user/create" class="btn-create">
+                                    <i class="fas fa-user-plus me-2"></i>Thêm Người Dùng
+                                </a>
+                            </div>
                         </div>
+                        
+                        <!-- Search Result Info -->
+                        <c:if test="${not empty keyword}">
+                            <div class="search-result-bar">
+                                <span><i class="fas fa-search me-2"></i>Tìm thấy <strong>${totalItems}</strong> kết quả cho "<strong>${keyword}</strong>"</span>
+                                <a href="/admin/user" class="btn-clear-search"><i class="fas fa-times me-1"></i>Xóa tìm kiếm</a>
+                            </div>
+                        </c:if>
+                        
                         <div class="card-body p-0">
                             <c:choose>
                                 <c:when test="${empty users1}">
@@ -43,8 +73,16 @@
                                         <div class="empty-icon">
                                             <i class="fas fa-users"></i>
                                         </div>
-                                        <div class="empty-title">Chưa có người dùng nào</div>
-                                        <div class="empty-text">Thêm người dùng đầu tiên để bắt đầu</div>
+                                        <c:choose>
+                                            <c:when test="${not empty keyword}">
+                                                <div class="empty-title">Không tìm thấy người dùng</div>
+                                                <div class="empty-text">Không có kết quả phù hợp với "${keyword}"</div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="empty-title">Chưa có người dùng nào</div>
+                                                <div class="empty-text">Thêm người dùng đầu tiên để bắt đầu</div>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                 </c:when>
                                 <c:otherwise>
@@ -65,6 +103,11 @@
                                                     <td><span class="user-email">${user.email}</span></td>
                                                     <td><span class="user-name">${user.fullName}</span></td>
                                                     <td>
+                                                        <c:if test="${user.role.name == 'SUPER_ADMIN'}">
+                                                            <span class="status-badge" style="background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%); color: #92400e;">
+                                                                <i class="fas fa-star me-1"></i>SUPER ADMIN
+                                                            </span>
+                                                        </c:if>
                                                         <c:if test="${user.role.name == 'ADMIN'}">
                                                             <span class="status-badge" style="background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%); color: #b91c1c;">
                                                                 <i class="fas fa-crown me-1"></i>ADMIN
@@ -75,15 +118,31 @@
                                                                 <i class="fas fa-user-check me-1"></i>USER
                                                             </span>
                                                         </c:if>
+                                                        <c:if test="${user.role.name == 'STAFF'}">
+                                                            <span class="status-badge" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #047857;">
+                                                                <i class="fas fa-user-tie me-1"></i>STAFF
+                                                            </span>
+                                                        </c:if>
                                                     </td>
                                                     <td>
                                                         <div class="action-buttons">
                                                             <a href="/admin/user/${user.id}" class="btn-action btn-view" title="Xem chi tiết">
                                                                 <i class="fas fa-eye"></i>Xem
                                                             </a>
-                                                            <a href="/admin/user/update/${user.id}" class="btn-action btn-edit" title="Cập nhật">
-                                                                <i class="fas fa-edit"></i>Sửa
-                                                            </a>
+                                                            <%-- SUPER_ADMIN có thể sửa tất cả --%>
+                                                            <sec:authorize access="hasRole('SUPER_ADMIN')">
+                                                                <a href="/admin/user/update/${user.id}" class="btn-action btn-edit" title="Chỉnh sửa">
+                                                                    <i class="fas fa-edit"></i>Sửa
+                                                                </a>
+                                                            </sec:authorize>
+                                                            <%-- ADMIN có thể sửa STAFF và chính mình --%>
+                                                            <sec:authorize access="hasRole('ADMIN') and !hasRole('SUPER_ADMIN')">
+                                                                <c:if test="${user.role.name == 'STAFF' or user.id == sessionScope.id}">
+                                                                    <a href="/admin/user/update/${user.id}" class="btn-action btn-edit" title="Chỉnh sửa">
+                                                                        <i class="fas fa-edit"></i>Sửa
+                                                                    </a>
+                                                                </c:if>
+                                                            </sec:authorize>
                                                             <a href="/admin/user/delete/${user.id}" class="btn-action btn-delete" title="Xóa">
                                                                 <i class="fas fa-trash"></i>Xóa
                                                             </a>
@@ -96,8 +155,61 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
+                        <!-- Pagination -->
+                        <c:if test="${totalPages > 1}">
+                            <div class="card-footer d-flex justify-content-center align-items-center">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination mb-0">
+                                        <!-- Previous Button -->
+                                        <li class="page-item <c:if test='${currentPage == 1}'>disabled</c:if>">
+                                            <a class="page-link" href="/admin/user?pageNo=<c:out value='${currentPage - 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>" <c:if test='${currentPage == 1}'>onclick="return false;"</c:if>>
+                                                <i class="fas fa-chevron-left"></i> Trước
+                                            </a>
+                                        </li>
+
+                                        <!-- Page Numbers -->
+                                        <c:set var="startPage" value="${currentPage > 2 ? currentPage - 2 : 1}" />
+                                        <c:set var="endPage" value="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}" />
+                                        
+                                        <c:if test="${startPage > 1}">
+                                            <li class="page-item">
+                                                <a class="page-link" href="/admin/user?pageNo=1<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">1</a>
+                                            </li>
+                                            <c:if test="${startPage > 2}">
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            </c:if>
+                                        </c:if>
+
+                                        <c:forEach var="page" begin="${startPage}" end="${endPage}">
+                                            <li class="page-item <c:if test='${page == currentPage}'>active</c:if>">
+                                                <a class="page-link" href="/admin/user?pageNo=${page}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">${page}</a>
+                                            </li>
+                                        </c:forEach>
+
+                                        <c:if test="${endPage < totalPages}">
+                                            <c:if test="${endPage < totalPages - 1}">
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            </c:if>
+                                            <li class="page-item">
+                                                <a class="page-link" href="/admin/user?pageNo=${totalPages}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">${totalPages}</a>
+                                            </li>
+                                        </c:if>
+
+                                        <!-- Next Button -->
+                                        <li class="page-item <c:if test='${currentPage == totalPages}'>disabled</c:if>">
+                                            <a class="page-link" href="/admin/user?pageNo=<c:out value='${currentPage + 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>" <c:if test='${currentPage == totalPages}'>onclick="return false;"</c:if>>
+                                                Sau <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </c:if>
                     </div>
-                </div>
             </main>
             <jsp:include page="../layout/footer.jsp" />
         </div>

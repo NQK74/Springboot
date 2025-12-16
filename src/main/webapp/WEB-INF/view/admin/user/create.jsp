@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -108,7 +109,11 @@
                                                 <label for="role" class="form-label"><i class="fas fa-shield-alt me-2"></i>Vai Trò <span style="color: #dc3545;">*</span></label>
                                                 <form:select class="form-select" path="role.name">
                                                     <form:option value="USER">Người Dùng (USER)</form:option>
-                                                    <form:option value="ADMIN">Quản Trị Viên (ADMIN)</form:option>
+                                                    <form:option value="STAFF">Nhân Viên (STAFF)</form:option>
+                                                    <sec:authorize access="hasRole('SUPER_ADMIN')">
+                                                        <form:option value="ADMIN">Quản Trị Viên (ADMIN)</form:option>
+                                                        <form:option value="SUPER_ADMIN">Super Admin (SUPER_ADMIN)</form:option>
+                                                    </sec:authorize>
                                                 </form:select>
                                             </div>
                                         </div>

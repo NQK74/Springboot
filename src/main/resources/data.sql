@@ -1,11 +1,17 @@
 -- Insert roles
 INSERT IGNORE INTO roles (id, name, description) VALUES 
 (1, 'USER', 'Regular user role'),
-(2, 'ADMIN', 'Administrator role');
+(2, 'ADMIN', 'Administrator role'),
+(3, 'STAFF', 'Staff role - manage products and orders'),
+(4, 'SUPER_ADMIN', 'Super Administrator - highest level access');
 
--- Insert admin user (password: Admin@123)
+-- Insert super admin user (password: 123456) - ID = 1 is SUPER_ADMIN
 INSERT IGNORE INTO users (id, email, password, full_name, phone, address, avatar, role_id) VALUES 
-(1, 'admin@laptopshop.com', '$2a$10$0vYpkBGV8zL8zJWvIcnL6.8X2K.L5mXBBBqYf8H8Q5ypCqCqkZfCe', 'Administrator', '0123456789', 'Hanoi, Vietnam', '', 2);
+(1, 'superadmin@laptopshop.com', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MqrqvBLRn9jN6IvBzP2CJcPfLDRPYTC', 'Super Administrator', '0123456789', 'Hanoi, Vietnam', '', 4);
+
+-- Insert regular admin user (password: 123456)
+INSERT IGNORE INTO users (id, email, password, full_name, phone, address, avatar, role_id) VALUES 
+(2, 'admin@laptopshop.com', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MqrqvBLRn9jN6IvBzP2CJcPfLDRPYTC', 'Administrator', '0123456789', 'Hanoi, Vietnam', '', 2);
 
 INSERT INTO products (name, price, detail_desc, short_desc, quantity, so_id, factory, target, image) VALUES 
 ('ASUS TUF Gaming F15 FX506HF', 17490000, 'Laptop gaming với Intel Core i5 thế hệ 11, card đồ họa RTX 2050, RAM 16GB DDR4. Thiết kế bền bỉ chuẩn quân đội, tản nhiệt Arc Flow Fans, phím RGB.', 'Laptop gaming ASUS hiệu năng cao', 85, 0, 'ASUS', 'GAMING', '1711078092373-asus-tuf-gaming-f15.webp'),

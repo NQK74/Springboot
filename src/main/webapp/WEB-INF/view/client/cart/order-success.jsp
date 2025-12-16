@@ -60,7 +60,7 @@
                 <a href="/" class="btn-primary-custom">
                     <i class="fas fa-home me-2"></i>Về Trang Chủ
                 </a>
-                <a href="/products" class="btn-secondary-custom">
+                <a href="/product/show" class="btn-secondary-custom">
                     <i class="fas fa-shopping-bag me-2"></i>Tiếp Tục Mua Sắm
                 </a>
             </div>

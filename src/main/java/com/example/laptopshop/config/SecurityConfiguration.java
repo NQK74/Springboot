@@ -68,10 +68,14 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
-                        .requestMatchers("/", "/login", "/register", "/product/**", "/client/**", "/css/**", "/js/**",
+                        .requestMatchers("/", "/login", "/register", "/forgot-password", "/verify-otp", "/reset-password", 
+                                "/product/**", "/client/**", "/css/**", "/js/**",
                                 "/images/**", "/resources/**")
                         .permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        // Super Admin and Admin can access user management
+                        .requestMatchers("/admin/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        // Super Admin, Admin and Staff can access these routes
+                        .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "STAFF")
                         .anyRequest().authenticated())
 
                 .sessionManagement((sessionManagement) -> sessionManagement
@@ -82,6 +86,8 @@ public class SecurityConfiguration {
                         .maxSessionsPreventsLogin(false))
 
                 .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true))
 

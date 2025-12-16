@@ -1,0 +1,1 @@
+python main.py "đường/dẫn/project"

@@ -35,6 +35,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         Map<String, String> roleTargetUrlMap = new HashMap<>();
         roleTargetUrlMap.put("ROLE_USER", "/");
         roleTargetUrlMap.put("ROLE_ADMIN", "/admin");
+        roleTargetUrlMap.put("ROLE_STAFF", "/admin");
+        roleTargetUrlMap.put("ROLE_SUPER_ADMIN", "/admin");
 
         final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (final GrantedAuthority grantedAuthority : authorities) {
@@ -63,6 +65,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
             session.setAttribute("avatar", user.getAvatar());
             session.setAttribute("id", user.getId());
             session.setAttribute("email", user.getEmail());
+            session.setAttribute("role", user.getRole() != null ? user.getRole().getName() : "USER");
             int sum = user.getCart() == null ? 0 : user.getCart().getSum();
             session.setAttribute("sum", sum);
         }

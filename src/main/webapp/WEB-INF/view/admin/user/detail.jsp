@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,6 +77,11 @@
                                         <div class="info-group">
                                             <div class="info-label"><i class="fas fa-shield-alt me-2"></i>Vai Trò</div>
                                             <div class="info-value">
+                                                <c:if test="${user.role.name == 'SUPER_ADMIN'}">
+                                                    <span class="status-badge" style="background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%); color: #92400e;">
+                                                        <i class="fas fa-star me-1"></i>${user.role.name}
+                                                    </span>
+                                                </c:if>
                                                 <c:if test="${user.role.name == 'ADMIN'}">
                                                     <span class="status-badge" style="background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%); color: #b91c1c;">
                                                         <i class="fas fa-crown me-1"></i>${user.role.name}
@@ -84,6 +90,11 @@
                                                 <c:if test="${user.role.name == 'USER'}">
                                                     <span class="status-badge" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af;">
                                                         <i class="fas fa-user-check me-1"></i>${user.role.name}
+                                                    </span>
+                                                </c:if>
+                                                <c:if test="${user.role.name == 'STAFF'}">
+                                                    <span class="status-badge" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #047857;">
+                                                        <i class="fas fa-user-tie me-1"></i>${user.role.name}
                                                     </span>
                                                 </c:if>
                                             </div>
@@ -98,9 +109,20 @@
                                         <a href="/admin/user" class="btn-action btn-back">
                                             <i class="fas fa-arrow-left"></i>Quay Lại
                                         </a>
-                                        <a href="/admin/user/update/${user.id}" class="btn-action btn-edit">
-                                            <i class="fas fa-edit"></i>Chỉnh Sửa
-                                        </a>
+                                        <%-- SUPER_ADMIN có thể sửa tất cả --%>
+                                        <sec:authorize access="hasRole('SUPER_ADMIN')">
+                                            <a href="/admin/user/update/${user.id}" class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>Chỉnh Sửa
+                                            </a>
+                                        </sec:authorize>
+                                        <%-- ADMIN có thể sửa STAFF và chính mình --%>
+                                        <sec:authorize access="hasRole('ADMIN') and !hasRole('SUPER_ADMIN')">
+                                            <c:if test="${user.role.name == 'STAFF' or user.id == sessionScope.id}">
+                                                <a href="/admin/user/update/${user.id}" class="btn-action btn-edit">
+                                                    <i class="fas fa-edit"></i>Chỉnh Sửa
+                                                </a>
+                                            </c:if>
+                                        </sec:authorize>
                                         <a href="/admin/user/delete/${user.id}" class="btn-action btn-delete">
                                             <i class="fas fa-trash-alt"></i>Xóa
                                         </a>

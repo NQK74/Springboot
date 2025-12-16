@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,8 +98,27 @@
                                             <div class="form-group">
                                                 <label for="role" class="form-label"><i class="fas fa-shield-alt me-2"></i>Vai Trò</label>
                                                 <form:select class="form-select" path="role.name">
-                                                    <form:option value="USER">Người Dùng (USER)</form:option>
-                                                    <form:option value="ADMIN">Quản Trị Viên (ADMIN)</form:option>
+                                                    <%-- SUPER_ADMIN có thể chọn tất cả vai trò --%>
+                                                    <sec:authorize access="hasRole('SUPER_ADMIN')">
+                                                        <form:option value="USER">Người Dùng (USER)</form:option>
+                                                        <form:option value="STAFF">Nhân Viên (STAFF)</form:option>
+                                                        <form:option value="ADMIN">Quản Trị Viên (ADMIN)</form:option>
+                                                        <form:option value="SUPER_ADMIN">Super Admin (SUPER_ADMIN)</form:option>
+                                                    </sec:authorize>
+                                                    <%-- ADMIN chỉ có thể chọn STAFF hoặc USER (không thể thay đổi khi sửa chính mình) --%>
+                                                    <sec:authorize access="hasRole('ADMIN') and !hasRole('SUPER_ADMIN')">
+                                                        <c:choose>
+                                                            <c:when test="${user.id == sessionScope.id}">
+                                                                <%-- Khi sửa chính mình, chỉ hiển thị vai trò hiện tại --%>
+                                                                <form:option value="${user.role.name}">${user.role.name}</form:option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <%-- Khi sửa STAFF, có thể chọn USER hoặc STAFF --%>
+                                                                <form:option value="USER">Người Dùng (USER)</form:option>
+                                                                <form:option value="STAFF">Nhân Viên (STAFF)</form:option>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </sec:authorize>
                                                 </form:select>
                                             </div>
                                         </div>

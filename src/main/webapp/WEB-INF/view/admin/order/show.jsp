@@ -67,7 +67,32 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5><i class="fas fa-list me-2"></i>Danh Sách Đơn Hàng</h5>
+                        <!-- Search Form -->
+                        <form action="/admin/order" method="get" class="admin-search-form">
+                            <div class="admin-search-box">
+                                <input type="text" name="keyword" class="admin-search-input" 
+                                       placeholder="Tìm mã ĐH, tên, SĐT, email..." 
+                                       value="${keyword}">
+                                <button type="submit" class="admin-search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
+                    
+                    <!-- Search Result Info -->
+                    <c:if test="${not empty keyword}">
+                        <div class="search-result-bar">
+                            <span>
+                                <i class="fas fa-search me-2"></i>
+                                Kết quả tìm kiếm cho "<strong>${keyword}</strong>": ${totalItems} đơn hàng
+                            </span>
+                            <a href="/admin/order" class="btn-clear-search">
+                                <i class="fas fa-times me-1"></i>Xóa tìm kiếm
+                            </a>
+                        </div>
+                    </c:if>
+                    
                     <div class="card-body p-0">
                         <c:choose>
                             <c:when test="${empty orders}">
@@ -167,6 +192,60 @@
                             </c:otherwise>
                         </c:choose>
                     </div>
+                    <!-- Pagination -->
+                    <c:if test="${totalPages > 1}">
+                        <div class="card-footer d-flex justify-content-center align-items-center">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination mb-0">
+                                    <!-- Previous Button -->
+                                    <li class="page-item <c:if test='${currentPage == 1}'>disabled</c:if>">
+                                        <a class="page-link" href="/admin/order?pageNo=<c:out value='${currentPage - 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>" <c:if test='${currentPage == 1}'>onclick="return false;"</c:if>>
+                                            <i class="fas fa-chevron-left"></i> Trước
+                                        </a>
+                                    </li>
+
+                                    <!-- Page Numbers -->
+                                    <c:set var="startPage" value="${currentPage > 2 ? currentPage - 2 : 1}" />
+                                    <c:set var="endPage" value="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}" />
+                                    
+                                    <c:if test="${startPage > 1}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="/admin/order?pageNo=1<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">1</a>
+                                        </li>
+                                        <c:if test="${startPage > 2}">
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        </c:if>
+                                    </c:if>
+
+                                    <c:forEach var="page" begin="${startPage}" end="${endPage}">
+                                        <li class="page-item <c:if test='${page == currentPage}'>active</c:if>">
+                                            <a class="page-link" href="/admin/order?pageNo=${page}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">${page}</a>
+                                        </li>
+                                    </c:forEach>
+
+                                    <c:if test="${endPage < totalPages}">
+                                        <c:if test="${endPage < totalPages - 1}">
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        </c:if>
+                                        <li class="page-item">
+                                            <a class="page-link" href="/admin/order?pageNo=${totalPages}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">${totalPages}</a>
+                                        </li>
+                                    </c:if>
+
+                                    <!-- Next Button -->
+                                    <li class="page-item <c:if test='${currentPage == totalPages}'>disabled</c:if>">
+                                        <a class="page-link" href="/admin/order?pageNo=<c:out value='${currentPage + 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>" <c:if test='${currentPage == totalPages}'>onclick="return false;"</c:if>>
+                                            Sau <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </c:if>
                 </div>
             </div>
         </main>

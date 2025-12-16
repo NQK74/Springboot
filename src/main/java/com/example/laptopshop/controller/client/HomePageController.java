@@ -1,7 +1,9 @@
 package com.example.laptopshop.controller.client;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.laptopshop.domain.Product;
 import com.example.laptopshop.domain.User;
@@ -17,7 +20,6 @@ import com.example.laptopshop.service.ProductService;
 import com.example.laptopshop.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -35,9 +37,55 @@ public class HomePageController {
 
     @GetMapping("/")
     public String getHomePage(Model model, HttpServletRequest request) {
-        List<Product> products = productService.fetchProducts();
+        List<Product> allProducts = productService.fetchProducts();
+        // Hiển thị 8 sản phẩm đầu tiên
+        List<Product> products = allProducts.stream().limit(8).toList();
         model.addAttribute("products", products);
         return "client/homepage/show";
+    }
+
+    @GetMapping("/product/show")
+    public String getAllProducts(Model model, 
+                                  @RequestParam(value = "pageNo", required = false) Optional<String> pageNo,
+                                  @RequestParam(value = "factory", required = false) List<String> factories,
+                                  @RequestParam(value = "target", required = false) List<String> targets,
+                                  @RequestParam(value = "minPrice", required = false) Double minPrice,
+                                  @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+                                  @RequestParam(value = "sort", required = false) String sort,
+                                  @RequestParam(value = "keyword", required = false) String keyword) {
+        int pageNumber = 1;
+        
+        if (pageNo.isPresent()) {
+            try {
+                pageNumber = Integer.parseInt(pageNo.get());
+                if (pageNumber < 1) {
+                    pageNumber = 1;
+                }
+            } catch (NumberFormatException e) {
+                pageNumber = 1;
+            }
+        }
+        
+        Page<Product> page = productService.fetchProductsWithFilters(pageNumber, factories, targets, minPrice, maxPrice, sort, keyword);
+        
+        model.addAttribute("products", page.getContent());
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalItems", page.getTotalElements());
+        
+        // Get all factories and targets for filter options
+        model.addAttribute("allFactories", productService.getAllFactories());
+        model.addAttribute("allTargets", productService.getAllTargets());
+        
+        // Keep selected filter values
+        model.addAttribute("selectedFactories", factories);
+        model.addAttribute("selectedTargets", targets);
+        model.addAttribute("selectedMinPrice", minPrice);
+        model.addAttribute("selectedMaxPrice", maxPrice);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("keyword", keyword);
+        
+        return "client/product/show";
     }
 
     @GetMapping("/login")

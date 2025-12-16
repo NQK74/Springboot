@@ -1,7 +1,9 @@
 package com.example.laptopshop.controller.admin;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,9 +32,35 @@ public class ProductController {
     }
 
     @GetMapping("admin/product")
-    public String getProduct(Model model) {
-        List<Product> products = productService.fetchProducts();
-        model.addAttribute("products", products);
+    public String getProduct(Model model, 
+                             @RequestParam(value = "pageNo", required = false) Optional<String> pageNo,
+                             @RequestParam(value = "keyword", required = false) String keyword) {
+        int pageNumber = 1;
+        
+        if (pageNo.isPresent()) {
+            try {
+                pageNumber = Integer.parseInt(pageNo.get());
+                if (pageNumber < 1) {
+                    pageNumber = 1;
+                }
+            } catch (NumberFormatException e) {
+                pageNumber = 1;
+            }
+        }
+        
+        Page<Product> page;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            page = productService.searchProductsWithPagination(keyword.trim(), pageNumber);
+            model.addAttribute("keyword", keyword.trim());
+        } else {
+            page = productService.fetchProductsWithPagination(pageNumber);
+        }
+        
+        model.addAttribute("products", page.getContent());
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalItems", page.getTotalElements());
+        
         return "admin/product/show";
     }
 
