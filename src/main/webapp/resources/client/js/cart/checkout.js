@@ -6,4 +6,12 @@ function selectPayment(element, method) {
     // Check the radio button
     const input = element.querySelector('input[type="radio"]');
     if (input) input.checked = true;
+    
+    // Thay đổi form action dựa trên phương thức thanh toán
+    const form = document.getElementById('checkoutForm');
+    if (method === 'VNPAY') {
+        form.action = '/vnpay/create-payment';
+    } else {
+        form.action = '/place-order';
+    }
 }

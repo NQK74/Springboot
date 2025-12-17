@@ -27,6 +27,7 @@ public class Order {
     private String receiverEmail;
     private String note;
     private String paymentMethod;
+    private String paymentStatus; // PAID, UNPAID
 
     private String status;
     
@@ -141,6 +142,14 @@ public class Order {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public LocalDateTime getOrderDate() {

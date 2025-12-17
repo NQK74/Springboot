@@ -76,6 +76,10 @@ public class ProductService {
         return this.productRepository.findAll();
     }
 
+    public long countAllProducts() {
+        return this.productRepository.count();
+    }
+
     public Page<Product> fetchProductsWithPagination(int pageNo) {
         Pageable pageable = PageRequest.of(pageNo - 1, 6);
         return this.productRepository.findAll(pageable);
@@ -344,7 +348,16 @@ public class ProductService {
         order.setReceiverEmail(receiverEmail);
         order.setNote(note);
         order.setPaymentMethod(paymentMethod);
-        order.setStatus("PENDING");
+        
+        // Đặt trạng thái thanh toán và trạng thái đơn hàng dựa trên phương thức thanh toán
+        if ("VNPAY".equals(paymentMethod)) {
+            order.setPaymentStatus("PAID"); // VNPay: đã thanh toán
+            order.setStatus("CONFIRMED"); // VNPay: tự động xác nhận
+        } else {
+            order.setPaymentStatus("UNPAID"); // COD: chưa thanh toán
+            order.setStatus("PENDING"); // COD: chờ xác nhận
+        }
+        
         order.setOrderDate(LocalDateTime.now());
 
         // Tính tổng giá chỉ cho các sản phẩm đã chọn

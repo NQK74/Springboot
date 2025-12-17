@@ -78,6 +78,12 @@ public class OrderController {
         return "redirect:/admin/order/" + id;
     }
     
+    @PostMapping("/admin/order/{id}/update-payment-status")
+    public String updatePaymentStatus(@PathVariable long id, @RequestParam String paymentStatus) {
+        this.orderService.updatePaymentStatus(id, paymentStatus);
+        return "redirect:/admin/order/" + id;
+    }
+    
     @PostMapping("/admin/order/{id}/delete")
     public String deleteOrder(@PathVariable long id) {
         this.orderService.deleteOrder(id);

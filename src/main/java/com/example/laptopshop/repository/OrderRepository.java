@@ -16,13 +16,21 @@ import com.example.laptopshop.domain.User;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUser(User user);
+    
+    // Lấy đơn hàng của user sắp xếp theo ngày mới nhất (cho client)
+    List<Order> findByUserOrderByOrderDateDescIdDesc(User user);
+    
+    // Lấy tất cả đơn hàng sắp xếp theo ngày mới nhất
+    @Query("SELECT o FROM Order o ORDER BY o.orderDate DESC, o.id DESC")
+    Page<Order> findAllOrderByOrderDateDesc(Pageable pageable);
 
-    // Tìm kiếm order theo id, receiverName, receiverPhone, receiverEmail, hoặc status
+    // Tìm kiếm order theo id, receiverName, receiverPhone, receiverEmail, hoặc status - sắp xếp mới nhất
     @Query("SELECT o FROM Order o WHERE CAST(o.id AS string) LIKE CONCAT('%', :keyword, '%') " +
            "OR LOWER(o.receiverName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
            "OR LOWER(o.receiverPhone) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
            "OR LOWER(o.receiverEmail) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR LOWER(o.status) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+           "OR LOWER(o.status) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "ORDER BY o.orderDate DESC, o.id DESC")
     Page<Order> searchOrders(@Param("keyword") String keyword, Pageable pageable);
 
     // Lấy đơn hàng trong khoảng thời gian

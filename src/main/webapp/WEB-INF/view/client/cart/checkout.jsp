@@ -43,7 +43,7 @@
                 </div>
             </div>
             
-            <form action="/place-order" method="post">
+            <form id="checkoutForm" action="/place-order" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 
                 <div class="row">
@@ -61,15 +61,18 @@
                                         <label class="form-label">
                                             <i class="fas fa-user me-1 text-muted"></i>Họ và Tên
                                         </label>
-                                        <input type="text" class="form-control" name="receiverName" 
-                                               placeholder="Nguyễn Văn A" required>
+                                        <input type="text" class="form-control" name="receiverName" id="receiverName"
+                                               placeholder="Nguyễn Văn A" value="${user.fullName}" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">
                                             <i class="fas fa-phone me-1 text-muted"></i>Số Điện Thoại
                                         </label>
-                                        <input type="tel" class="form-control" name="receiverPhone" 
-                                               placeholder="0901234567" required>
+                                        <input type="tel" class="form-control" name="receiverPhone" id="receiverPhone"
+                                               placeholder="0901234567" value="${user.phone}" 
+                                               pattern="^(0|\+84)[0-9]{9,10}$" 
+                                               title="Số điện thoại phải bắt đầu bằng 0 hoặc +84 và có 10-11 số" required>
+                                        <div class="invalid-feedback" id="phoneError">Số điện thoại không hợp lệ (VD: 0901234567)</div>
                                     </div>
                                 </div>
                                 
@@ -77,16 +80,16 @@
                                     <label class="form-label">
                                         <i class="fas fa-envelope me-1 text-muted"></i>Email
                                     </label>
-                                    <input type="email" class="form-control" name="receiverEmail" 
-                                           placeholder="email@example.com" value="${sessionScope.email}">
+                                    <input type="email" class="form-control" name="receiverEmail" id="receiverEmail"
+                                           placeholder="email@example.com" value="${user.email}">
                                 </div>
                                 
                                 <div class="mb-3">
                                     <label class="form-label">
                                         <i class="fas fa-map-marker-alt me-1 text-muted"></i>Địa Chỉ Giao Hàng
                                     </label>
-                                    <input type="text" class="form-control" name="receiverAddress" 
-                                           placeholder="Số nhà, tên đường, phường/xã" required>
+                                    <input type="text" class="form-control" name="receiverAddress" id="receiverAddress"
+                                           placeholder="Số nhà, tên đường, phường/xã" value="${user.address}" required>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -238,5 +241,36 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <script src="/client/js/cart/checkout.js"></script>
+    <script>
+        // Validate số điện thoại
+        document.getElementById('receiverPhone').addEventListener('input', function() {
+            const phone = this.value;
+            const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
+            
+            if (phone && !phoneRegex.test(phone)) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (phone) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-invalid', 'is-valid');
+            }
+        });
+        
+        // Validate form trước khi submit
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            const phone = document.getElementById('receiverPhone').value;
+            const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
+            
+            if (!phoneRegex.test(phone)) {
+                e.preventDefault();
+                document.getElementById('receiverPhone').classList.add('is-invalid');
+                document.getElementById('receiverPhone').focus();
+                alert('Vui lòng nhập số điện thoại hợp lệ (VD: 0901234567)');
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>

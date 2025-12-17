@@ -109,11 +109,12 @@
                                     <table class="order-table table mb-0">
                                         <thead>
                                             <tr>
-                                                <th style="width: 8%;">Mã ĐH</th>
-                                                <th style="width: 22%;">Khách Hàng</th>
-                                                <th style="width: 15%;">Tổng Tiền</th>
-                                                <th style="width: 15%;">Trạng Thái</th>
-                                                <th style="width: 40%;">Hành Động</th>
+                                                <th style="width: 7%;">Mã ĐH</th>
+                                                <th style="width: 18%;">Khách Hàng</th>
+                                                <th style="width: 13%;">Tổng Tiền</th>
+                                                <th style="width: 12%;">Thanh Toán</th>
+                                                <th style="width: 13%;">Trạng Thái</th>
+                                                <th style="width: 37%;">Hành Động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -135,6 +136,33 @@
                                                         <span class="price-badge">
                                                             <fmt:formatNumber value="${order.totalPrice}" type="number"/> đ
                                                         </span>
+                                                    </td>
+                                                    <td data-label="Thanh Toán">
+                                                        <c:choose>
+                                                            <c:when test="${order.paymentStatus == 'PAID'}">
+                                                                <span class="status-badge badge-delivered" style="font-size: 0.75rem;">
+                                                                    <i class="fas fa-check-circle"></i> Đã thanh toán
+                                                                </span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="status-badge badge-pending" style="font-size: 0.75rem;">
+                                                                    <i class="fas fa-clock"></i> Chưa thanh toán
+                                                                </span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <div style="font-size: 0.7rem; color: #6b7280; margin-top: 3px;">
+                                                            <c:choose>
+                                                                <c:when test="${order.paymentMethod == 'VNPAY'}">
+                                                                    <i class="fas fa-qrcode"></i> VNPay
+                                                                </c:when>
+                                                                <c:when test="${order.paymentMethod == 'BANKING'}">
+                                                                    <i class="fas fa-university"></i> Banking
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <i class="fas fa-money-bill-wave"></i> COD
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </div>
                                                     </td>
                                                     <td data-label="Trạng Thái">
                                                         <c:choose>

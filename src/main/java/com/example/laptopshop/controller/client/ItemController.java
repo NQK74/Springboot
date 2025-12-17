@@ -215,6 +215,7 @@ public class ItemController {
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("cart", cart);
+        model.addAttribute("user", user);
         
         return "client/cart/checkout";
     }

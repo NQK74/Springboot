@@ -41,7 +41,7 @@ public class OrderService {
     
     public Page<Order> getAllOrdersWithPagination(int pageNo) {
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
-        return this.orderRepository.findAll(pageable);
+        return this.orderRepository.findAllOrderByOrderDateDesc(pageable);
     }
 
     /**
@@ -60,10 +60,10 @@ public class OrderService {
     }
 
     /**
-     * Lấy lịch sử đơn hàng của một user
+     * Lấy lịch sử đơn hàng của một user (sắp xếp theo ngày mới nhất)
      */
     public List<Order> getOrdersByUser(User user) {
-        return this.orderRepository.findByUser(user);
+        return this.orderRepository.findByUserOrderByOrderDateDescIdDesc(user);
     }
 
     /**
@@ -81,6 +81,18 @@ public class OrderService {
         if (orderOptional.isPresent()) {
             Order order = orderOptional.get();
             order.setStatus(status);
+            this.orderRepository.save(order);
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái thanh toán
+     */
+    public void updatePaymentStatus(long orderId, String paymentStatus) {
+        Optional<Order> orderOptional = this.orderRepository.findById(orderId);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            order.setPaymentStatus(paymentStatus);
             this.orderRepository.save(order);
         }
     }

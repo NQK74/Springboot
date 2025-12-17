@@ -75,6 +75,10 @@ public class UserService {
         return this.userRepository.existsByEmail(email);
     }
 
+    public long countAllUsers() {
+        return this.userRepository.count();
+    }
+
     public User registerDTOtoUser(RegisterDTO registerDTO) {
         User user = new User();
         user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());

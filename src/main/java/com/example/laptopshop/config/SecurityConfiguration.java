@@ -70,7 +70,7 @@ public class SecurityConfiguration {
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/verify-otp", "/reset-password", 
                                 "/product/**", "/client/**", "/css/**", "/js/**",
-                                "/images/**", "/resources/**")
+                                "/images/**", "/resources/**", "/vnpay/payment-return")
                         .permitAll()
                         // Super Admin and Admin can access user management
                         .requestMatchers("/admin/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")

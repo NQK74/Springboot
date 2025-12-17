@@ -186,6 +186,26 @@
                                     </div>
                                     <div class="info-item">
                                         <div class="info-label">
+                                            <i class="fas fa-receipt"></i>
+                                            Trạng Thái Thanh Toán
+                                        </div>
+                                        <div class="info-value">
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus == 'PAID'}">
+                                                    <span class="status-badge badge-delivered">
+                                                        <i class="fas fa-check-circle"></i> Đã Thanh Toán
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-badge badge-pending">
+                                                        <i class="fas fa-clock"></i> Chưa Thanh Toán
+                                                    </span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">
                                             <i class="fas fa-sticky-note"></i>
                                             Ghi Chú
                                         </div>
@@ -284,44 +304,71 @@
                     
                     <!-- Status Update -->
                     <div class="row mb-4">
-                        <div class="col-12">
+                        <div class="col-lg-6 mb-4">
                             <div class="modern-card">
                                 <div class="card-header">
-                                    <h5><i class="fas fa-sync-alt me-2"></i>Cập Nhật Trạng Thái</h5>
+                                    <h5><i class="fas fa-sync-alt me-2"></i>Cập Nhật Trạng Thái Đơn Hàng</h5>
                                 </div>
                                 <div class="card-body">
                                     <form action="/admin/order/${order.id}/update-status" method="post">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                         <div class="status-form">
-                                            <div class="row g-3 align-items-end">
-                                                <div class="col-md-8">
-                                                    <label for="status" class="form-label fw-bold">
-                                                        <i class="fas fa-tasks me-2"></i>Chọn Trạng Thái Mới
-                                                    </label>
-                                                    <select class="form-select" id="status" name="status" required>
-                                                        <option value="PENDING" ${order.status == 'PENDING' ? 'selected' : ''}>
-                                                            ⏳ Chờ Xác Nhận
-                                                        </option>
-                                                        <option value="CONFIRMED" ${order.status == 'CONFIRMED' ? 'selected' : ''}>
-                                                            ✅ Đã Xác Nhận
-                                                        </option>
-                                                        <option value="SHIPPED" ${order.status == 'SHIPPED' ? 'selected' : ''}>
-                                                            🚚 Đang Giao Hàng
-                                                        </option>
-                                                        <option value="DELIVERED" ${order.status == 'DELIVERED' ? 'selected' : ''}>
-                                                            ✔️ Đã Giao Hàng
-                                                        </option>
-                                                        <option value="CANCELLED" ${order.status == 'CANCELLED' ? 'selected' : ''}>
-                                                            ❌ Đã Hủy
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <button type="submit" class="btn btn-primary-gradient btn-modern w-100">
-                                                        <i class="fas fa-save me-2"></i>Lưu Thay Đổi
-                                                    </button>
-                                                </div>
+                                            <div class="mb-3">
+                                                <label for="status" class="form-label fw-bold">
+                                                    <i class="fas fa-tasks me-2"></i>Chọn Trạng Thái Mới
+                                                </label>
+                                                <select class="form-select" id="status" name="status" required>
+                                                    <option value="PENDING" ${order.status == 'PENDING' ? 'selected' : ''}>
+                                                        ⏳ Chờ Xác Nhận
+                                                    </option>
+                                                    <option value="CONFIRMED" ${order.status == 'CONFIRMED' ? 'selected' : ''}>
+                                                        ✅ Đã Xác Nhận
+                                                    </option>
+                                                    <option value="SHIPPED" ${order.status == 'SHIPPED' ? 'selected' : ''}>
+                                                        🚚 Đang Giao Hàng
+                                                    </option>
+                                                    <option value="DELIVERED" ${order.status == 'DELIVERED' ? 'selected' : ''}>
+                                                        ✔️ Đã Giao Hàng
+                                                    </option>
+                                                    <option value="CANCELLED" ${order.status == 'CANCELLED' ? 'selected' : ''}>
+                                                        ❌ Đã Hủy
+                                                    </option>
+                                                </select>
                                             </div>
+                                            <button type="submit" class="btn btn-primary-gradient btn-modern w-100">
+                                                <i class="fas fa-save me-2"></i>Lưu Trạng Thái
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6 mb-4">
+                            <div class="modern-card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-money-check-alt me-2"></i>Cập Nhật Thanh Toán</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/order/${order.id}/update-payment-status" method="post">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                        <div class="status-form">
+                                            <div class="mb-3">
+                                                <label for="paymentStatus" class="form-label fw-bold">
+                                                    <i class="fas fa-receipt me-2"></i>Trạng Thái Thanh Toán
+                                                </label>
+                                                <select class="form-select" id="paymentStatus" name="paymentStatus" required>
+                                                    <option value="UNPAID" ${order.paymentStatus != 'PAID' ? 'selected' : ''}>
+                                                        ⏳ Chưa Thanh Toán
+                                                    </option>
+                                                    <option value="PAID" ${order.paymentStatus == 'PAID' ? 'selected' : ''}>
+                                                        ✅ Đã Thanh Toán
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-success btn-modern w-100" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                                                <i class="fas fa-save me-2"></i>Lưu Thanh Toán
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
