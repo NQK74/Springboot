@@ -25,7 +25,7 @@
 </head>
 <body>
     <!-- Spinner Start -->
-    <div class="show w-100 vh-100 position-fixed top-0 start-0" id="spinner">
+    <div class="show w-100 vh-100 position-fixed top-0 start-0" id="spinner" style="pointer-events: none;">
         <div class="spinner-grow text-primary" role="status"></div>
     </div>
 

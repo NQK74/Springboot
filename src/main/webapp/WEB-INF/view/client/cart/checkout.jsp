@@ -89,7 +89,12 @@
                                         <i class="fas fa-map-marker-alt me-1 text-muted"></i>Địa Chỉ Giao Hàng
                                     </label>
                                     <input type="text" class="form-control" name="receiverAddress" id="receiverAddress"
-                                           placeholder="Số nhà, tên đường, phường/xã" value="${user.address}" required>
+                                           placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" 
+                                           value="${user.address}" 
+                                           minlength="10"
+                                           title="Địa chỉ phải có ít nhất 10 ký tự" required>
+                                    <div class="invalid-feedback" id="addressError">Địa chỉ không hợp lệ (tối thiểu 10 ký tự, bao gồm số nhà, tên đường, quận/huyện)</div>
+                                    <small class="text-muted">VD: 123 Nguyễn Văn A, Phường 1, Quận 1, TP.HCM</small>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -258,16 +263,56 @@
             }
         });
         
+        // Validate địa chỉ
+        document.getElementById('receiverAddress').addEventListener('input', function() {
+            const address = this.value.trim();
+            // Địa chỉ phải có ít nhất 10 ký tự và chứa ít nhất 2 từ
+            const isValid = address.length >= 10 && address.split(/\s+/).length >= 2;
+            
+            if (address && !isValid) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (address && isValid) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-invalid', 'is-valid');
+            }
+        });
+        
         // Validate form trước khi submit
         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             const phone = document.getElementById('receiverPhone').value;
             const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
+            const address = document.getElementById('receiverAddress').value.trim();
+            const name = document.getElementById('receiverName').value.trim();
             
+            let hasError = false;
+            
+            // Validate tên
+            if (!name || name.length < 2) {
+                e.preventDefault();
+                document.getElementById('receiverName').classList.add('is-invalid');
+                document.getElementById('receiverName').focus();
+                alert('Vui lòng nhập họ và tên hợp lệ');
+                return false;
+            }
+            
+            // Validate số điện thoại
             if (!phoneRegex.test(phone)) {
                 e.preventDefault();
                 document.getElementById('receiverPhone').classList.add('is-invalid');
                 document.getElementById('receiverPhone').focus();
                 alert('Vui lòng nhập số điện thoại hợp lệ (VD: 0901234567)');
+                return false;
+            }
+            
+            // Validate địa chỉ (ít nhất 10 ký tự và 2 từ)
+            if (address.length < 10 || address.split(/\s+/).length < 2) {
+                e.preventDefault();
+                document.getElementById('receiverAddress').classList.add('is-invalid');
+                document.getElementById('receiverAddress').focus();
+                alert('Vui lòng nhập địa chỉ đầy đủ (VD: 123 Nguyễn Văn A, Phường 1, Quận 1, TP.HCM)');
                 return false;
             }
         });

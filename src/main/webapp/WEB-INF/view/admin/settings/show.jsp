@@ -379,13 +379,13 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Số Điện Thoại</label>
-                                        <input type="tel" class="form-control" name="sitePhone" value="0123 456 789" placeholder="Nhập số điện thoại">
+                                        <input type="tel" class="form-control" name="sitePhone" value="0398794461" placeholder="Nhập số điện thoại">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Địa Chỉ</label>
-                                        <input type="text" class="form-control" name="siteAddress" value="Hà Nội, Việt Nam" placeholder="Nhập địa chỉ">
+                                        <input type="text" class="form-control" name="siteAddress" value="Đà Nẵng, Việt Nam" placeholder="Nhập địa chỉ">
                                     </div>
                                 </div>
                             </div>

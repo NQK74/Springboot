@@ -49,8 +49,6 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
-    
-
     public long getId() {
         return id;
     }

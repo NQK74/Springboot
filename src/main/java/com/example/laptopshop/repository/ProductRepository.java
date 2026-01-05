@@ -29,4 +29,12 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     
     @Query("SELECT DISTINCT p.target FROM Product p WHERE p.target IS NOT NULL")
     List<String> findAllTargets();
+    
+    // For AI Chatbot RAG
+    List<Product> findByFactoryContainingIgnoreCase(String factory, Pageable pageable);
+    
+    List<Product> findByTargetContainingIgnoreCase(String target, Pageable pageable);
+    
+    @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice ORDER BY p.price ASC")
+    List<Product> findByPriceBetween(@Param("minPrice") double minPrice, @Param("maxPrice") double maxPrice, Pageable pageable);
 }

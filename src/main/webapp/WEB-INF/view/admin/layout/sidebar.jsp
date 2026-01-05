@@ -40,6 +40,8 @@
                     Đơn Hàng
                 </a>
                 
+                <%-- AI Chatbot - không cần quản lý, tự động trả lời bởi Gemini AI --%>
+                
                 <div class="sb-sidenav-menu-heading">Hệ Thống</div>
                 <sec:authorize access="hasAnyRole('ADMIN', 'SUPER_ADMIN')">
                     <a class="nav-link" href="/admin/settings" data-page="settings">
@@ -101,6 +103,10 @@
             // Activate Order
             const orderLink = document.querySelector('.nav-link[data-page="order"]');
             if (orderLink) orderLink.classList.add('active');
+        } else if (currentPath.startsWith('/admin/chat')) {
+            // Activate Chat
+            const chatLink = document.querySelector('.nav-link[data-page="chat"]');
+            if (chatLink) chatLink.classList.add('active');
         } else if (currentPath.startsWith('/admin/settings')) {
             // Activate Settings
             const settingsLink = document.querySelector('.nav-link[data-page="settings"]');
@@ -110,5 +116,24 @@
             const reportsLink = document.querySelector('.nav-link[data-page="reports"]');
             if (reportsLink) reportsLink.classList.add('active');
         }
+        
+        // Poll for chat badge count
+        function updateChatBadge() {
+            fetch('/api/admin/chat/count')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('chatBadgeSidebar');
+                    if (badge && data.waitingCount > 0) {
+                        badge.textContent = data.waitingCount;
+                        badge.style.display = 'inline-block';
+                    } else if (badge) {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(() => {});
+        }
+        
+        updateChatBadge();
+        setInterval(updateChatBadge, 5000);
     });
 </script>

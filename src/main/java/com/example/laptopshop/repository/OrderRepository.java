@@ -39,4 +39,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Lấy đơn hàng đã giao (DELIVERED) trong khoảng thời gian
     @Query("SELECT o FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.status = 'DELIVERED'")
     List<Order> findDeliveredOrdersBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    // Tìm kiếm order theo status - sắp xếp mới nhất
+    @Query("SELECT o FROM Order o WHERE o.status = :status ORDER BY o.orderDate DESC, o.id DESC")
+    Page<Order> findByStatus(@Param("status") String status, Pageable pageable);
+
+    // Tìm kiếm order theo keyword và status - sắp xếp mới nhất
+    @Query("SELECT o FROM Order o WHERE " +
+           "(CAST(o.id AS string) LIKE CONCAT('%', :keyword, '%') " +
+           "OR LOWER(o.receiverName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(o.receiverPhone) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(o.receiverEmail) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND o.status = :status " +
+           "ORDER BY o.orderDate DESC, o.id DESC")
+    Page<Order> searchOrdersByStatus(@Param("keyword") String keyword, @Param("status") String status, Pageable pageable);
+
+    // Đếm số đơn hàng theo status
+    long countByStatus(String status);
 }

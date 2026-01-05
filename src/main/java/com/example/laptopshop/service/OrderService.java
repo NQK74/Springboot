@@ -12,23 +12,29 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.laptopshop.domain.Order;
 import com.example.laptopshop.domain.OrderDetail;
+import com.example.laptopshop.domain.Product;
 import com.example.laptopshop.domain.User;
 import com.example.laptopshop.domain.dto.RevenueDTO;
 import com.example.laptopshop.repository.OrderDetailRepository;
 import com.example.laptopshop.repository.OrderRepository;
+import com.example.laptopshop.repository.ProductRepository;
 
 @Service
 public class OrderService {
     
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final ProductRepository productRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository) {
+    public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository,
+                       ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
+        this.productRepository = productRepository;
     }
 
     /**
@@ -50,6 +56,29 @@ public class OrderService {
     public Page<Order> searchOrdersWithPagination(String keyword, int pageNo) {
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
         return this.orderRepository.searchOrders(keyword, pageable);
+    }
+
+    /**
+     * Lấy đơn hàng theo status với phân trang
+     */
+    public Page<Order> getOrdersByStatusWithPagination(String status, int pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 5);
+        return this.orderRepository.findByStatus(status, pageable);
+    }
+
+    /**
+     * Tìm kiếm đơn hàng theo keyword và status với phân trang
+     */
+    public Page<Order> searchOrdersByStatusWithPagination(String keyword, String status, int pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 5);
+        return this.orderRepository.searchOrdersByStatus(keyword, status, pageable);
+    }
+
+    /**
+     * Đếm số đơn hàng theo status
+     */
+    public long countByStatus(String status) {
+        return this.orderRepository.countByStatus(status);
     }
 
     /**
@@ -75,13 +104,41 @@ public class OrderService {
 
     /**
      * Cập nhật trạng thái đơn hàng
+     * Nếu chuyển sang CANCELLED (hủy/bom hàng) sẽ hoàn trả số lượng sản phẩm vào kho
      */
+    @Transactional
     public void updateOrderStatus(long orderId, String status) {
         Optional<Order> orderOptional = this.orderRepository.findById(orderId);
         if (orderOptional.isPresent()) {
             Order order = orderOptional.get();
+            String oldStatus = order.getStatus();
+            
+            // Nếu chuyển sang trạng thái CANCELLED và trước đó chưa bị hủy
+            // Thì hoàn trả số lượng sản phẩm vào kho
+            if ("CANCELLED".equals(status) && !"CANCELLED".equals(oldStatus)) {
+                restoreProductQuantity(order);
+            }
+            
             order.setStatus(status);
             this.orderRepository.save(order);
+        }
+    }
+
+    /**
+     * Hoàn trả số lượng sản phẩm khi hủy đơn hàng
+     */
+    @Transactional
+    public void restoreProductQuantity(Order order) {
+        List<OrderDetail> orderDetails = order.getOrderDetails();
+        if (orderDetails != null && !orderDetails.isEmpty()) {
+            for (OrderDetail od : orderDetails) {
+                Product product = od.getProduct();
+                if (product != null) {
+                    long restoredQuantity = product.getQuantity() + od.getQuantity();
+                    product.setQuantity(restoredQuantity);
+                    this.productRepository.save(product);
+                }
+            }
         }
     }
 

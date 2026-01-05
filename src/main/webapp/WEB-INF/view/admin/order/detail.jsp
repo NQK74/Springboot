@@ -310,8 +310,9 @@
                                     <h5><i class="fas fa-sync-alt me-2"></i>Cập Nhật Trạng Thái Đơn Hàng</h5>
                                 </div>
                                 <div class="card-body">
-                                    <form action="/admin/order/${order.id}/update-status" method="post">
+                                    <form id="statusForm" onsubmit="return updateOrderStatus(event)">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                        <input type="hidden" id="orderId" value="${order.id}"/>
                                         <div class="status-form">
                                             <div class="mb-3">
                                                 <label for="status" class="form-label fw-bold">
@@ -335,7 +336,7 @@
                                                     </option>
                                                 </select>
                                             </div>
-                                            <button type="submit" class="btn btn-primary-gradient btn-modern w-100">
+                                            <button type="submit" class="btn btn-primary-gradient btn-modern w-100" id="statusBtn">
                                                 <i class="fas fa-save me-2"></i>Lưu Trạng Thái
                                             </button>
                                         </div>
@@ -350,7 +351,7 @@
                                     <h5><i class="fas fa-money-check-alt me-2"></i>Cập Nhật Thanh Toán</h5>
                                 </div>
                                 <div class="card-body">
-                                    <form action="/admin/order/${order.id}/update-payment-status" method="post">
+                                    <form id="paymentForm" onsubmit="return updatePaymentStatus(event)">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                         <div class="status-form">
                                             <div class="mb-3">
@@ -366,7 +367,7 @@
                                                     </option>
                                                 </select>
                                             </div>
-                                            <button type="submit" class="btn btn-success btn-modern w-100" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                                            <button type="submit" class="btn btn-success btn-modern w-100" id="paymentBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
                                                 <i class="fas fa-save me-2"></i>Lưu Thanh Toán
                                             </button>
                                         </div>
@@ -401,5 +402,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="/js/scripts.js"></script>
+<div id="toastContainer" class="toast-container"></div>
+<script src="/js/order/detail.js"></script>
 </body>
 </html>

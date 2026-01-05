@@ -33,34 +33,41 @@
 
                 <!-- Stats Cards -->
                 <div class="stats-container">
-                    <div class="stat-card">
+                    <a href="/admin/order?status=PENDING" class="stat-card ${status == 'PENDING' ? 'active' : ''}" style="text-decoration: none;">
                         <div class="stat-icon stat-pending">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div class="stat-value" id="pendingCount">0</div>
+                        <div class="stat-value">${pendingCount}</div>
                         <div class="stat-label">Chờ Xác Nhận</div>
-                    </div>
-                    <div class="stat-card">
+                    </a>
+                    <a href="/admin/order?status=CONFIRMED" class="stat-card ${status == 'CONFIRMED' ? 'active' : ''}" style="text-decoration: none;">
                         <div class="stat-icon stat-confirmed">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="stat-value" id="confirmedCount">0</div>
+                        <div class="stat-value">${confirmedCount}</div>
                         <div class="stat-label">Đã Xác Nhận</div>
-                    </div>
-                    <div class="stat-card">
+                    </a>
+                    <a href="/admin/order?status=SHIPPED" class="stat-card ${status == 'SHIPPED' ? 'active' : ''}" style="text-decoration: none;">
                         <div class="stat-icon stat-shipped">
                             <i class="fas fa-shipping-fast"></i>
                         </div>
-                        <div class="stat-value" id="shippedCount">0</div>
+                        <div class="stat-value">${shippedCount}</div>
                         <div class="stat-label">Đang Giao</div>
-                    </div>
-                    <div class="stat-card">
+                    </a>
+                    <a href="/admin/order?status=DELIVERED" class="stat-card ${status == 'DELIVERED' ? 'active' : ''}" style="text-decoration: none;">
                         <div class="stat-icon stat-delivered">
                             <i class="fas fa-check-double"></i>
                         </div>
-                        <div class="stat-value" id="deliveredCount">0</div>
+                        <div class="stat-value">${deliveredCount}</div>
                         <div class="stat-label">Đã Giao</div>
-                    </div>
+                    </a>
+                    <a href="/admin/order?status=CANCELLED" class="stat-card ${status == 'CANCELLED' ? 'active' : ''}" style="text-decoration: none;">
+                        <div class="stat-icon stat-cancelled">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-value">${cancelledCount}</div>
+                        <div class="stat-label">Đã Hủy</div>
+                    </a>
                 </div>
                 
                 <!-- Orders Table -->
@@ -73,6 +80,7 @@
                                 <input type="text" name="keyword" class="admin-search-input" 
                                        placeholder="Tìm mã ĐH, tên, SĐT, email..." 
                                        value="${keyword}">
+                                <input type="hidden" name="status" value="${status}"/>
                                 <button type="submit" class="admin-search-btn">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -80,15 +88,31 @@
                         </form>
                     </div>
                     
-                    <!-- Search Result Info -->
-                    <c:if test="${not empty keyword}">
+                    <!-- Filter Result Info -->
+                    <c:if test="${not empty keyword || not empty status}">
                         <div class="search-result-bar">
                             <span>
-                                <i class="fas fa-search me-2"></i>
-                                Kết quả tìm kiếm cho "<strong>${keyword}</strong>": ${totalItems} đơn hàng
+                                <i class="fas fa-filter me-2"></i>
+                                <c:if test="${not empty status}">
+                                    Trạng thái: <strong>
+                                        <c:choose>
+                                            <c:when test="${status == 'PENDING'}">Chờ Xác Nhận</c:when>
+                                            <c:when test="${status == 'CONFIRMED'}">Đã Xác Nhận</c:when>
+                                            <c:when test="${status == 'SHIPPED'}">Đang Giao</c:when>
+                                            <c:when test="${status == 'DELIVERED'}">Đã Giao</c:when>
+                                            <c:when test="${status == 'CANCELLED'}">Đã Hủy</c:when>
+                                            <c:otherwise>${status}</c:otherwise>
+                                        </c:choose>
+                                    </strong>
+                                </c:if>
+                                <c:if test="${not empty keyword}">
+                                    <c:if test="${not empty status}"> | </c:if>
+                                    Tìm kiếm: "<strong>${keyword}</strong>"
+                                </c:if>
+                                - ${totalItems} đơn hàng
                             </span>
                             <a href="/admin/order" class="btn-clear-search">
-                                <i class="fas fa-times me-1"></i>Xóa tìm kiếm
+                                <i class="fas fa-times me-1"></i>Xem tất cả
                             </a>
                         </div>
                     </c:if>
@@ -227,7 +251,7 @@
                                 <ul class="pagination mb-0">
                                     <!-- Previous Button -->
                                     <li class="page-item <c:if test='${currentPage == 1}'>disabled</c:if>">
-                                        <a class="page-link" href="/admin/order?pageNo=<c:out value='${currentPage - 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>" <c:if test='${currentPage == 1}'>onclick="return false;"</c:if>>
+                                        <a class="page-link" href="/admin/order?pageNo=<c:out value='${currentPage - 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty status}'>&status=${status}</c:if>" <c:if test='${currentPage == 1}'>onclick="return false;"</c:if>>
                                             <i class="fas fa-chevron-left"></i> Trước
                                         </a>
                                     </li>
@@ -238,7 +262,7 @@
                                     
                                     <c:if test="${startPage > 1}">
                                         <li class="page-item">
-                                            <a class="page-link" href="/admin/order?pageNo=1<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">1</a>
+                                            <a class="page-link" href="/admin/order?pageNo=1<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty status}'>&status=${status}</c:if>">1</a>
                                         </li>
                                         <c:if test="${startPage > 2}">
                                             <li class="page-item disabled">
@@ -249,7 +273,7 @@
 
                                     <c:forEach var="page" begin="${startPage}" end="${endPage}">
                                         <li class="page-item <c:if test='${page == currentPage}'>active</c:if>">
-                                            <a class="page-link" href="/admin/order?pageNo=${page}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">${page}</a>
+                                            <a class="page-link" href="/admin/order?pageNo=${page}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty status}'>&status=${status}</c:if>">${page}</a>
                                         </li>
                                     </c:forEach>
 
@@ -260,13 +284,13 @@
                                             </li>
                                         </c:if>
                                         <li class="page-item">
-                                            <a class="page-link" href="/admin/order?pageNo=${totalPages}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>">${totalPages}</a>
+                                            <a class="page-link" href="/admin/order?pageNo=${totalPages}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty status}'>&status=${status}</c:if>">${totalPages}</a>
                                         </li>
                                     </c:if>
 
                                     <!-- Next Button -->
                                     <li class="page-item <c:if test='${currentPage == totalPages}'>disabled</c:if>">
-                                        <a class="page-link" href="/admin/order?pageNo=<c:out value='${currentPage + 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if>" <c:if test='${currentPage == totalPages}'>onclick="return false;"</c:if>>
+                                        <a class="page-link" href="/admin/order?pageNo=<c:out value='${currentPage + 1}'/><c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty status}'>&status=${status}</c:if>" <c:if test='${currentPage == totalPages}'>onclick="return false;"</c:if>>
                                             Sau <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>
@@ -282,39 +306,5 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="/js/scripts.js"></script>
-<script>
-    // Calculate order statistics
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('tbody tr[data-status]');
-        
-        let pendingCount = 0;
-        let confirmedCount = 0;
-        let shippedCount = 0;
-        let deliveredCount = 0;
-        
-        rows.forEach(row => {
-            const status = row.getAttribute('data-status');
-            switch(status) {
-                case 'PENDING':
-                    pendingCount++;
-                    break;
-                case 'CONFIRMED':
-                    confirmedCount++;
-                    break;
-                case 'SHIPPED':
-                    shippedCount++;
-                    break;
-                case 'DELIVERED':
-                    deliveredCount++;
-                    break;
-            }
-        });
-        
-        document.getElementById('pendingCount').textContent = pendingCount;
-        document.getElementById('confirmedCount').textContent = confirmedCount;
-        document.getElementById('shippedCount').textContent = shippedCount;
-        document.getElementById('deliveredCount').textContent = deliveredCount;
-    });
-</script>
 </body>
 </html>

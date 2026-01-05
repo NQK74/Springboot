@@ -101,7 +101,8 @@
 </div>
 </div>
 
-
+<!-- Chatbot Widget -->
+<jsp:include page="chatbot.jsp" />
 
 <!-- Copyright End -->
 <!-- Footer Improved End -->

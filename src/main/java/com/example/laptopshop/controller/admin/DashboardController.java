@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.laptopshop.domain.Order;
-import com.example.laptopshop.domain.User;
 import com.example.laptopshop.domain.dto.RevenueDTO;
 import com.example.laptopshop.repository.OrderRepository;
 import com.example.laptopshop.service.OrderService;
@@ -102,7 +101,7 @@ public class DashboardController {
         long totalOrders = allOrders.size();
         long pendingOrders = allOrders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
         long confirmedOrders = allOrders.stream().filter(o -> "CONFIRMED".equals(o.getStatus())).count();
-        long shippingOrders = allOrders.stream().filter(o -> "SHIPPING".equals(o.getStatus())).count();
+        long shippingOrders = allOrders.stream().filter(o -> "SHIPPED".equals(o.getStatus())).count();
         long deliveredOrders = allOrders.stream().filter(o -> "DELIVERED".equals(o.getStatus())).count();
         long cancelledOrders = allOrders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
         

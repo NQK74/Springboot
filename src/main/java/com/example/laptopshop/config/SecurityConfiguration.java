@@ -66,14 +66,20 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/chatbot/**", "/api/ai-chatbot/**", "/api/admin/**"))
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/verify-otp", "/reset-password", 
                                 "/product/**", "/client/**", "/css/**", "/js/**",
-                                "/images/**", "/resources/**", "/vnpay/payment-return")
+                                "/images/**", "/resources/**", "/vnpay/payment-return",
+                                "/api/chatbot/**", "/api/ai-chatbot/**",
+                                "/error", "/test/**")
                         .permitAll()
                         // Super Admin and Admin can access user management
                         .requestMatchers("/admin/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        // API Admin endpoints
+                        .requestMatchers("/api/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "STAFF")
                         // Super Admin, Admin and Staff can access these routes
                         .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "STAFF")
                         .anyRequest().authenticated())

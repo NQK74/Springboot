@@ -27,7 +27,8 @@ public class OrderController {
     @GetMapping("/admin/order")
     public String getOrderPage(Model model, 
                                @RequestParam(value = "pageNo", required = false) Optional<String> pageNo,
-                               @RequestParam(value = "keyword", required = false) String keyword) {
+                               @RequestParam(value = "keyword", required = false) String keyword,
+                               @RequestParam(value = "status", required = false) String status) {
         int pageNumber = 1;
         
         if (pageNo.isPresent()) {
@@ -42,12 +43,33 @@ public class OrderController {
         }
         
         Page<Order> page;
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasStatus = status != null && !status.trim().isEmpty() && !"ALL".equals(status);
+        
+        if (hasKeyword && hasStatus) {
+            // Tìm kiếm theo keyword và status
+            page = this.orderService.searchOrdersByStatusWithPagination(keyword.trim(), status, pageNumber);
+            model.addAttribute("keyword", keyword.trim());
+            model.addAttribute("status", status);
+        } else if (hasKeyword) {
+            // Chỉ tìm kiếm theo keyword
             page = this.orderService.searchOrdersWithPagination(keyword.trim(), pageNumber);
             model.addAttribute("keyword", keyword.trim());
+        } else if (hasStatus) {
+            // Chỉ filter theo status
+            page = this.orderService.getOrdersByStatusWithPagination(status, pageNumber);
+            model.addAttribute("status", status);
         } else {
+            // Lấy tất cả
             page = this.orderService.getAllOrdersWithPagination(pageNumber);
         }
+        
+        // Thống kê số đơn theo trạng thái
+        model.addAttribute("pendingCount", this.orderService.countByStatus("PENDING"));
+        model.addAttribute("confirmedCount", this.orderService.countByStatus("CONFIRMED"));
+        model.addAttribute("shippedCount", this.orderService.countByStatus("SHIPPED"));
+        model.addAttribute("deliveredCount", this.orderService.countByStatus("DELIVERED"));
+        model.addAttribute("cancelledCount", this.orderService.countByStatus("CANCELLED"));
         
         model.addAttribute("orders", page.getContent());
         model.addAttribute("totalPages", page.getTotalPages());
