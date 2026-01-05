@@ -1,7 +1,7 @@
 ## Setup
 
 1. Clone project
-2. Tạo file `src/main/resources/application-local.properties`:
+2. Tạo file `src/main/resources/application.properties`:
 spring.jpa.hibernate.ddl-auto=update
 spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/laptopshop
 spring.datasource.username=root
